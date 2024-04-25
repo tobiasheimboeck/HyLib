@@ -1,0 +1,4 @@
+rootProject.name = 'elytra-database'
+include 'database-api'
+include 'database-common'
+
