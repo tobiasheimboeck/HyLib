@@ -1,13 +1,24 @@
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.tasks.Jar
 
+repositories {
+    mavenCentral()
+    maven {
+        name = "hytale-release"
+        url = uri("https://maven.hytale.com/release")
+    }
+    maven {
+        name = "hytale-pre-release"
+        url = uri("https://maven.hytale.com/pre-release")
+    }
+}
+
 dependencies {
-    compileOnly(libs.gson)
+    implementation(project(":database-common"))
+    compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
+    
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
-    compileOnly(libs.mariadb.jdbc)
-    compileOnly(libs.hikaricp)
 }
 
 tasks.named<Jar>("jar") {
@@ -16,6 +27,7 @@ tasks.named<Jar>("jar") {
             if (file.isDirectory) file else zipTree(file)
         }
     )
+    dependsOn(":database-common:jar")
     from(rootProject.file("LICENSE"))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }

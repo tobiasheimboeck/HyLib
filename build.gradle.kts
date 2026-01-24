@@ -1,7 +1,13 @@
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.javadoc.Javadoc
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.jvm.tasks.Jar
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.tasks.testing.Test
 
 allprojects {
-    group = "net.neptunsworld.elytra.database"
+    group = "dev.spacetivity.tobi.database"
     version = "1.0-SNAPSHOT"
 
     repositories {
@@ -14,35 +20,25 @@ subprojects {
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
 
-    dependencies {
-        compileOnly("com.google.code.gson:gson:2.10.1")
-        compileOnly("org.projectlombok:lombok:1.18.22")
-        annotationProcessor("org.projectlombok:lombok:1.18.22")
-
-        compileOnly("org.mariadb.jdbc:mariadb-java-client:3.0.7")
-        compileOnly("com.zaxxer:HikariCP:5.0.1")
-        compileOnly("org.redisson:redisson:3.20.1")
+    configure<JavaPluginExtension> {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(rootProject.libs.versions.java.get().toInt()))
+        }
+        withSourcesJar()
     }
 
-    tasks.test {
+    tasks.named<Test>("test") {
         useJUnitPlatform()
     }
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
-        javaCompiler = javaToolchains.compilerFor {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
     }
 
     tasks.withType<Javadoc>().configureEach {
         (options as StandardJavadocDocletOptions).encoding = "UTF-8"
     }
 
-    val sourcesJar by tasks.registering(Jar::class) {
-        from(sourceSets.main.get().allJava)
-        archiveClassifier.set("sources")
-    }
 
     tasks.named<Jar>("jar") {
         manifest {
