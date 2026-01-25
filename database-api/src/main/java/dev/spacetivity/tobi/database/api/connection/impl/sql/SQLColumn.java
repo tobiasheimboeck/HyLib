@@ -44,6 +44,26 @@ public class SQLColumn {
         return fromPrimary(Column.of(key), value, false);
     }
 
+    public static SQLColumn fromPrimaryAutoIncrement(Column column, SQLDataType value, boolean notNull) {
+        String valueString = value.getQueryText();
+        if (notNull) valueString += " " + SQLDataType.NOT_NULL.getQueryText();
+        valueString += " " + SQLDataType.AUTO_INCREMENT.getQueryText();
+        valueString += " " + SQLDataType.PRIMARY_KEY.getQueryText();
+        return new SQLColumn(column, valueString);
+    }
+
+    public static SQLColumn fromPrimaryAutoIncrement(Column column, SQLDataType value) {
+        return fromPrimaryAutoIncrement(column, value, true);
+    }
+
+    public static SQLColumn fromPrimaryAutoIncrement(String key, SQLDataType value, boolean notNull) {
+        return fromPrimaryAutoIncrement(Column.of(key), value, notNull);
+    }
+
+    public static SQLColumn fromPrimaryAutoIncrement(String key, SQLDataType value) {
+        return fromPrimaryAutoIncrement(Column.of(key), value, true);
+    }
+
     public static SQLColumn from(Column column, SQLDataType dataType) {
         return new SQLColumn(column, dataType.getQueryText() + " " + SQLDataType.NOT_NULL.getQueryText());
     }

@@ -11,6 +11,7 @@ public enum SQLDataType {
     VARCHAR("VARCHAR(255)"),
     CHAR("CHAR(1)"),
     TEXT("TEXT"),
+    UUID("BINARY(16)"), // UUID stored as BINARY(16) - 16 bytes
 
     // Numeric Types
     INTEGER("INT"),
@@ -32,7 +33,8 @@ public enum SQLDataType {
 
     // Constraints
     PRIMARY_KEY("PRIMARY KEY"),
-    NOT_NULL("NOT NULL");
+    NOT_NULL("NOT NULL"),
+    AUTO_INCREMENT("AUTO_INCREMENT");
 
     private final String queryText;
 
