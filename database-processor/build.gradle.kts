@@ -3,21 +3,13 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.tasks.Jar
 
 dependencies {
-    compileOnly(libs.gson)
-    compileOnly(libs.lombok)
-    annotationProcessor(libs.lombok)
-    compileOnly(libs.mariadb.jdbc)
-    compileOnly(libs.hikaricp)
-    compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
-
+    // Nur database-api für die Annotationen
+    implementation(project(":database-api"))
+    
+    // Annotation Processing API ist Teil von Java, keine extra Dependency nötig
 }
 
 tasks.named<Jar>("jar") {
-    from(
-        configurations.runtimeClasspath.get().map { file ->
-            if (file.isDirectory) file else zipTree(file)
-        }
-    )
     from(rootProject.file("LICENSE"))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
@@ -29,12 +21,12 @@ publishing {
             from(components["java"])
             
             groupId = project.group.toString()
-            artifactId = "database-api"
+            artifactId = "database-processor"
             version = project.version.toString()
             
             pom {
-                name.set("Database API")
-                description.set("Type-safe database API with SQL injection protection")
+                name.set("Database Processor")
+                description.set("Annotation processor for automatic codec generation")
                 url.set("https://github.com/${project.findProperty("github.owner")}/${project.findProperty("github.repo")}")
                 
                 licenses {

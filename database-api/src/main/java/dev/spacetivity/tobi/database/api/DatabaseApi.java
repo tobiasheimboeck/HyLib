@@ -1,6 +1,7 @@
 package dev.spacetivity.tobi.database.api;
 
 import dev.spacetivity.tobi.database.api.cache.CacheLoader;
+import dev.spacetivity.tobi.database.api.config.CodecLoader;
 import dev.spacetivity.tobi.database.api.connection.DatabaseConnectionHandler;
 import dev.spacetivity.tobi.database.api.repository.RepositoryLoader;
 
@@ -15,5 +16,7 @@ public interface DatabaseApi {
     CacheLoader getCacheLoader();
 
     RepositoryLoader getRepositoryLoader();
+
+    CodecLoader getCodecLoader();
 
 }

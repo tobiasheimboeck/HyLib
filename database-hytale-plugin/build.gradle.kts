@@ -1,24 +1,14 @@
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.jvm.tasks.Jar
 
-repositories {
-    mavenCentral()
-    maven {
-        name = "hytale-release"
-        url = uri("https://maven.hytale.com/release")
-    }
-    maven {
-        name = "hytale-pre-release"
-        url = uri("https://maven.hytale.com/pre-release")
-    }
-}
-
 dependencies {
     implementation(project(":database-common"))
+    implementation(project(":database-api"))
     compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
     
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
+    annotationProcessor(project(":database-processor"))
 }
 
 tasks.named<Jar>("jar") {

@@ -3,10 +3,12 @@ package dev.spacetivity.tobi.database.common;
 import lombok.Getter;
 import dev.spacetivity.tobi.database.api.DatabaseApi;
 import dev.spacetivity.tobi.database.api.cache.CacheLoader;
+import dev.spacetivity.tobi.database.api.config.CodecLoader;
 import dev.spacetivity.tobi.database.api.connection.DatabaseConnectionHandler;
 import dev.spacetivity.tobi.database.api.connection.credentials.impl.MariaDbCredentials;
 import dev.spacetivity.tobi.database.api.repository.RepositoryLoader;
 import dev.spacetivity.tobi.database.common.api.cache.CacheLoaderImpl;
+import dev.spacetivity.tobi.database.common.api.config.CodecLoaderImpl;
 import dev.spacetivity.tobi.database.common.api.connection.DatabaseConnectionHandlerImpl;
 import dev.spacetivity.tobi.database.common.api.repository.RepositoryLoaderImpl;
 
@@ -20,12 +22,14 @@ public class DatabaseApiImpl implements DatabaseApi {
     private final DatabaseConnectionHandler databaseConnectionHandler;
     private final CacheLoader cacheLoader;
     private final RepositoryLoader repositoryLoader;
+    private final CodecLoader codecLoader;
 
     public DatabaseApiImpl(MariaDbCredentials mariaDbCredentials) {
         this.executorService = Executors.newCachedThreadPool();
         this.databaseConnectionHandler = new DatabaseConnectionHandlerImpl(mariaDbCredentials);
         this.cacheLoader = new CacheLoaderImpl();
         this.repositoryLoader = new RepositoryLoaderImpl();
+        this.codecLoader = new CodecLoaderImpl();
     }
 
 }

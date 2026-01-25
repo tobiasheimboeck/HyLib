@@ -12,6 +12,23 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven {
+            name = "hytale-release"
+            url = uri("https://maven.hytale.com/release")
+        }
+        maven {
+            name = "hytale-pre-release"
+            url = uri("https://maven.hytale.com/pre-release")
+        }
+        // GitHub Packages Repository (für lokale Entwicklung)
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/${findProperty("github.owner")}/${findProperty("github.repo")}")
+            credentials {
+                username = findProperty("github.username") as String? ?: System.getenv("GITHUB_ACTOR")
+                password = findProperty("github.token") as String? ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 

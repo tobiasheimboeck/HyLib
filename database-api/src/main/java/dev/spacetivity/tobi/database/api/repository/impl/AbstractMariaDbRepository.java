@@ -2,7 +2,7 @@ package dev.spacetivity.tobi.database.api.repository.impl;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
-import dev.spacetivity.tobi.database.api.ElytraDatabaseProvider;
+import dev.spacetivity.tobi.database.api.DatabaseProvider;
 import dev.spacetivity.tobi.database.api.connection.DatabaseConnectionHandler;
 import dev.spacetivity.tobi.database.api.connection.DatabaseConnector;
 import dev.spacetivity.tobi.database.api.connection.DatabaseType;
@@ -163,7 +163,7 @@ public abstract class AbstractMariaDbRepository<T> implements Repository {
      */
     public CompletableFuture<T> getAsync(Column keyColumn, Object key) {
         CompletableFuture<T> asyncTask = new CompletableFuture<>();
-        ElytraDatabaseProvider.getApi().getExecutorService().execute(() -> asyncTask.complete(getSync(keyColumn, key)));
+        DatabaseProvider.getApi().getExecutorService().execute(() -> asyncTask.complete(getSync(keyColumn, key)));
         return asyncTask;
     }
 
@@ -173,7 +173,7 @@ public abstract class AbstractMariaDbRepository<T> implements Repository {
      */
     public CompletableFuture<List<T>> getAllAsync() {
         CompletableFuture<List<T>> asyncTask = new CompletableFuture<>();
-        ElytraDatabaseProvider.getApi().getExecutorService().execute(() -> asyncTask.complete(getAllSync()));
+        DatabaseProvider.getApi().getExecutorService().execute(() -> asyncTask.complete(getAllSync()));
         return asyncTask;
     }
 

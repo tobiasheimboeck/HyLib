@@ -11,6 +11,7 @@ dependencies {
     
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
+    compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
 }
 
 tasks.named<Jar>("jar") {
