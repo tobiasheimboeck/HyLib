@@ -10,19 +10,19 @@ import lombok.Setter;
 @Setter
 public class DbConfig {
 
-    @CodecField(value = "hostname", hasDefault = true, defaultValue = "localhost")
-    private String hostname;
+    @CodecField(value = "Hostname", hasDefault = true, defaultValue = "localhost")
+    private String hostname = "localhost";
 
-    @CodecField(value = "port", hasDefault = true, defaultValue = "5520")
-    private int port;
+    @CodecField(value = "Port", hasDefault = true, defaultValue = "5520")
+    private Integer port = 5520;
 
-    @CodecField(value = "username", hasDefault = false)
-    private String username;
+    @CodecField(value = "Username", hasDefault = true, defaultValue = "root")
+    private String username = "root";
 
-    @CodecField(value = "database", hasDefault = false)
-    private String database;
+    @CodecField(value = "Database", hasDefault = true, defaultValue = "game_db")
+    private String database = "game_db";
 
-    @CodecField(value = "password", hasDefault = false)
-    private String password;
+    @CodecField(value = "Password", hasDefault = true, defaultValue = "password")
+    private String password = "password";
 
 }

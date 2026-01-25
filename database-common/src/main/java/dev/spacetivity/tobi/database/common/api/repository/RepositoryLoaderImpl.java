@@ -23,13 +23,55 @@ public class RepositoryLoaderImpl implements RepositoryLoader {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Optional<Repository> get(Class<Repository> clazz) {
-        return Optional.ofNullable(this.repositories.get(clazz));
+        Repository repo = this.repositories.get(clazz);
+        if (repo != null) {
+            return Optional.of(repo);
+        }
+        // Fallback: Suche nach Subtypen
+        // Wenn clazz z.B. Repository.class ist, suche nach allen registrierten Repositories
+        // Wenn clazz z.B. TestRepository.class (gecastet) ist, suche nach TestRepository
+        for (Map.Entry<Class<?>, Repository> entry : this.repositories.entrySet()) {
+            // Prüfe ob die registrierte Klasse eine Instanz der gesuchten Klasse ist
+            if (clazz.isAssignableFrom(entry.getKey())) {
+                return Optional.of(entry.getValue());
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Repository getNullable(Class<Repository> clazz) {
-        return this.repositories.get(clazz);
+        Repository repo = this.repositories.get(clazz);
+        if (repo != null) {
+            return repo;
+        }
+        // Fallback: Suche nach Subtypen
+        for (Map.Entry<Class<?>, Repository> entry : this.repositories.entrySet()) {
+            if (clazz.isAssignableFrom(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends Repository> T getRepository(Class<T> clazz) {
+        // Suche nach exaktem Match
+        Repository repo = this.repositories.get(clazz);
+        if (repo != null && clazz.isInstance(repo)) {
+            return (T) repo;
+        }
+        // Fallback: Suche nach Subtypen
+        for (Map.Entry<Class<?>, Repository> entry : this.repositories.entrySet()) {
+            if (clazz.isAssignableFrom(entry.getKey()) && clazz.isInstance(entry.getValue())) {
+                return (T) entry.getValue();
+            }
+        }
+        return null;
     }
 
 }

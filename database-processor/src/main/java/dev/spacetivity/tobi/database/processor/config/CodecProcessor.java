@@ -37,7 +37,7 @@ public class CodecProcessor extends AbstractProcessor {
                 import com.hypixel.hytale.codec.KeyedCodec;
 
                 public final class %s {
-                    public static final BuilderCodec<%s> CODEC =
+                    private static final BuilderCodec<%s> CODEC_BASE =
                         BuilderCodec.builder(%s.class, %s::new)
                 """.formatted(packageName, generatedName, className, className, className));
 
@@ -53,9 +53,11 @@ public class CodecProcessor extends AbstractProcessor {
                 String setter = "set" + cap(fieldName);
                 String getter = "get" + cap(fieldName);
 
-                String defaultCode = "";
+                String defaultCode;
                 if (ann.hasDefault()) {
-                    defaultCode = "val != null ? val : " + parseDefault(type, ann.defaultValue());
+                    String defaultValue = parseDefault(type, ann.defaultValue());
+                    // Apply default in lambda if value is null
+                    defaultCode = "val != null ? val : " + defaultValue;
                 } else {
                     defaultCode = "val";
                 }
@@ -68,7 +70,13 @@ public class CodecProcessor extends AbstractProcessor {
                     """.formatted(key, codec, setter, defaultCode, getter));
             }
 
-            code.append("            .build();\n}\n");
+            code.append("            .build();\n");
+            
+            // Note: Defaults should be initialized as field initializers in the config class
+            // to ensure they're applied even when keys are missing from the config file
+            code.append("    public static final BuilderCodec<%s> CODEC = CODEC_BASE;\n".formatted(className));
+            
+            code.append("}\n");
 
             writeFile(packageName + "." + generatedName, code.toString());
         }
@@ -78,6 +86,7 @@ public class CodecProcessor extends AbstractProcessor {
     private String cap(String s) {
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
+
 
     private String resolveCodec(String type) {
         return switch (type) {

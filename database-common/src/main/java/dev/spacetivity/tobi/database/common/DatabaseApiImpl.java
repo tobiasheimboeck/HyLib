@@ -19,17 +19,21 @@ import java.util.concurrent.Executors;
 public class DatabaseApiImpl implements DatabaseApi {
 
     private final ExecutorService executorService;
-    private final DatabaseConnectionHandler databaseConnectionHandler;
-    private final CacheLoader cacheLoader;
-    private final RepositoryLoader repositoryLoader;
     private final CodecLoader codecLoader;
+    
+    private DatabaseConnectionHandler databaseConnectionHandler;
+    private CacheLoader cacheLoader;
+    private RepositoryLoader repositoryLoader;
 
-    public DatabaseApiImpl(MariaDbCredentials mariaDbCredentials) {
+    public DatabaseApiImpl() {
         this.executorService = Executors.newCachedThreadPool();
+        this.codecLoader = new CodecLoaderImpl();
+    }
+
+    public void establishConnection(MariaDbCredentials mariaDbCredentials) {
         this.databaseConnectionHandler = new DatabaseConnectionHandlerImpl(mariaDbCredentials);
         this.cacheLoader = new CacheLoaderImpl();
         this.repositoryLoader = new RepositoryLoaderImpl();
-        this.codecLoader = new CodecLoaderImpl();
     }
 
 }
