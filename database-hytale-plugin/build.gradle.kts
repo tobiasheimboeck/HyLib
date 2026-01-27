@@ -4,7 +4,7 @@ import org.gradle.jvm.tasks.Jar
 dependencies {
     implementation(project(":database-common"))
     implementation(project(":database-api"))
-    compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
+    compileOnly(libs.hytale.server)
     
     compileOnly(libs.lombok)
     compileOnly(libs.hikaricp)

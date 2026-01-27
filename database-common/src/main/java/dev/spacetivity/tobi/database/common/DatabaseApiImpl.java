@@ -26,7 +26,7 @@ public class DatabaseApiImpl implements DatabaseApi {
     private RepositoryLoader repositoryLoader;
 
     public DatabaseApiImpl() {
-        this.executorService = Executors.newCachedThreadPool();
+        this.executorService = Executors.newVirtualThreadPerTaskExecutor();
         this.codecLoader = new CodecLoaderImpl();
     }
 

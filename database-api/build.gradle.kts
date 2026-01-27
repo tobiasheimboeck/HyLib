@@ -8,7 +8,7 @@ dependencies {
     annotationProcessor(libs.lombok)
     compileOnly(libs.mariadb.jdbc)
     compileOnly(libs.hikaricp)
-    compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
+    compileOnly(libs.hytale.server)
 
 }
 

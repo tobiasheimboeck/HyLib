@@ -5,11 +5,13 @@ mariadb = "3.5.7"
 hikaricp = "7.0.2"
 java = "21"
 gradle = "9.2.0"
+hytale-server = "2026.01.27-734d39026"
 
 [libraries]
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 mariadb-jdbc = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb" }
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
+hytale-server = { module = "com.hypixel.hytale:Server", version.ref = "hytale-server" }
 
 [plugins]
