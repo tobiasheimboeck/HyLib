@@ -13,6 +13,7 @@ import java.util.List;
 public class SelectBuilder {
     private final List<Column> columns;
     private Table table;
+    private final List<Join> joins = new ArrayList<>();
     private final List<String> whereConditions = new ArrayList<>();
     private final List<Object> params = new ArrayList<>();
     private String orderByColumn;
@@ -34,6 +35,42 @@ public class SelectBuilder {
     }
 
     /**
+     * Adds an INNER JOIN clause.
+     * @param table the table to join
+     * @param leftColumn the column from the current table or previous join
+     * @param rightColumn the column from the joined table
+     * @return this builder for method chaining
+     */
+    public SelectBuilder innerJoin(Table table, Column leftColumn, Column rightColumn) {
+        joins.add(new Join(JoinType.INNER, table, leftColumn, rightColumn));
+        return this;
+    }
+
+    /**
+     * Adds a LEFT JOIN clause.
+     * @param table the table to join
+     * @param leftColumn the column from the current table or previous join
+     * @param rightColumn the column from the joined table
+     * @return this builder for method chaining
+     */
+    public SelectBuilder leftJoin(Table table, Column leftColumn, Column rightColumn) {
+        joins.add(new Join(JoinType.LEFT, table, leftColumn, rightColumn));
+        return this;
+    }
+
+    /**
+     * Adds a RIGHT JOIN clause.
+     * @param table the table to join
+     * @param leftColumn the column from the current table or previous join
+     * @param rightColumn the column from the joined table
+     * @return this builder for method chaining
+     */
+    public SelectBuilder rightJoin(Table table, Column leftColumn, Column rightColumn) {
+        joins.add(new Join(JoinType.RIGHT, table, leftColumn, rightColumn));
+        return this;
+    }
+
+    /**
      * Adds a WHERE condition (column = value).
      * Can be called multiple times to add AND conditions.
      * @param column the column to compare
@@ -42,6 +79,20 @@ public class SelectBuilder {
      */
     public SelectBuilder where(Column column, Object value) {
         whereConditions.add(column.toSql() + " = ?");
+        params.add(value);
+        return this;
+    }
+
+    /**
+     * Adds a WHERE condition with a qualified column (table.column = value).
+     * Useful when working with JOINs to specify which table's column to use.
+     * @param table the table containing the column
+     * @param column the column to compare
+     * @param value the value to compare against
+     * @return this builder for method chaining
+     */
+    public SelectBuilder where(Table table, Column column, Object value) {
+        whereConditions.add(table.toSql() + "." + column.toSql() + " = ?");
         params.add(value);
         return this;
     }
@@ -84,6 +135,14 @@ public class SelectBuilder {
         StringBuilder sql = new StringBuilder("SELECT ");
         sql.append(String.join(", ", columns.stream().map(Column::toSql).toList()));
         sql.append(" FROM ").append(table.toSql());
+
+        // Add JOIN clauses
+        for (Join join : joins) {
+            sql.append(" ").append(join.type().getSqlKeyword());
+            sql.append(" ").append(join.table().toSql());
+            sql.append(" ON ").append(join.leftColumn().toSql());
+            sql.append(" = ").append(join.rightColumn().toSql());
+        }
 
         if (!whereConditions.isEmpty()) {
             sql.append(" WHERE ").append(String.join(" AND ", whereConditions));

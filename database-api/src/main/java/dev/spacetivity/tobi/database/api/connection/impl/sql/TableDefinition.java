@@ -41,6 +41,16 @@ public class TableDefinition {
     public void generate() {
         StringJoiner fieldsString = new StringJoiner(", ");
         values.forEach(sqlColumn -> fieldsString.add(sqlColumn.getColumn().toSql() + " " + sqlColumn.getValue()));
+        
+        // Add foreign key constraints
+        for (SQLColumn sqlColumn : values) {
+            if (sqlColumn.getForeignKey() != null) {
+                ForeignKey fk = sqlColumn.getForeignKey();
+                fieldsString.add("FOREIGN KEY (" + sqlColumn.getColumn().toSql() + ") REFERENCES " + 
+                    fk.referencedTable().toSql() + "(" + fk.referencedColumn().toSql() + ")");
+            }
+        }
+        
         try (PreparedStatement statement = this.connection.prepareStatement(
                 "CREATE TABLE IF NOT EXISTS " + table.toSql() + " (" + fieldsString + ")")) {
             statement.execute();
