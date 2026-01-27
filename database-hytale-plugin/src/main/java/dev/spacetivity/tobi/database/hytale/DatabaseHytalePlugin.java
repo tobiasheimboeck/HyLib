@@ -2,6 +2,7 @@ package dev.spacetivity.tobi.database.hytale;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.util.Config;
 import dev.spacetivity.tobi.database.api.DatabaseProvider;
 import dev.spacetivity.tobi.database.api.connection.credentials.impl.MariaDbCredentials;

@@ -178,6 +178,30 @@ public abstract class AbstractMariaDbRepository<T> implements Repository {
     }
 
     /**
+     * Executes a query asynchronously and maps all results using the provided RowMapper.
+     * @param query the built query with SQL and parameters
+     * @param mapper the mapper to convert ResultSet rows to domain objects
+     * @return a CompletableFuture with the list of mapped domain objects
+     */
+    protected CompletableFuture<List<T>> queryAsync(BuiltQuery query, RowMapper<T> mapper) {
+        CompletableFuture<List<T>> asyncTask = new CompletableFuture<>();
+        DatabaseProvider.getApi().getExecutorService().execute(() -> asyncTask.complete(query(query, mapper)));
+        return asyncTask;
+    }
+
+    /**
+     * Executes a query asynchronously and maps the first result using the provided RowMapper.
+     * @param query the built query with SQL and parameters
+     * @param mapper the mapper to convert ResultSet row to domain object
+     * @return a CompletableFuture with an Optional containing the mapped domain object, or empty if no results
+     */
+    protected CompletableFuture<Optional<T>> queryOneAsync(BuiltQuery query, RowMapper<T> mapper) {
+        CompletableFuture<Optional<T>> asyncTask = new CompletableFuture<>();
+        DatabaseProvider.getApi().getExecutorService().execute(() -> asyncTask.complete(queryOne(query, mapper)));
+        return asyncTask;
+    }
+
+    /**
      * Gets a single record by key using the builder API.
      * @param keyColumn the key column
      * @param key the key value
