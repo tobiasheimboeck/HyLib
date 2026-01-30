@@ -1,22 +1,30 @@
-# Elytra Database API
+# HyLib
 
-A type-safe, SQL-injection-resistant database API for MariaDB (SQL).
+A Hytale utility library providing database functionality and Hytale-specific features.
 
 ## Features
 
+### Database Module (Hytale-independent)
 - **Type-safe SQL Queries** - Query Builder with explicit column lists
 - **SQL Injection Protection** - Validated identifiers (Table/Column) instead of string concatenation
 - **Flexible Query API** - Fluent Builder instead of enum-based templates
 - **RowMapper-based Mapping** - Clean separation of SQL and domain mapping
 - **Connection Pooling** - HikariCP for MariaDB
 - **In-Memory Cache** - Simple cache API
-- **Config API** - Type-safe configuration with annotation-based codec generation
+
+### Hytale Module
+- **Config API** - Type-safe configuration with fluent DSL codec builder
 
 ## Modules
 
-- `database-api`: Interfaces, abstractions, Query Builder, RowMapper, Config API
-- `database-common`: Default implementations (Api, ConnectionHandler, Loader, CodecLoader)
-- `database-processor`: Annotation processor for automatic codec generation
+### Database Modules (no Hytale dependencies)
+- `database-api`: Interfaces, abstractions, Query Builder, RowMapper (usable in Discord Bot, etc.)
+- `database-common`: Default implementations (Api, ConnectionHandler, Loader)
+
+### Hytale Modules (requires Hytale dependencies)
+- `hytale-api`: Hytale-specific API (CodecBuilder Interface)
+- `hytale-common`: Hytale-specific implementations (CodecBuilderImpl)
+- `database-hytale-plugin`: Hytale plugin combining both APIs
 
 ---
 
@@ -60,7 +68,7 @@ repositories {
 
 **Wichtig:** Ersetze `OWNER` und `REPO` mit deinen GitHub Repository-Informationen:
 - `OWNER`: GitHub Username oder Organisation (z.B. `spacetivity`)
-- `REPO`: Repository Name (z.B. `game-database-lib`)
+- `REPO`: Repository Name (z.B. `hylib`)
 
 #### 2. Authentifizierung einrichten
 
@@ -95,11 +103,13 @@ Füge die Dependencies zu deiner `build.gradle.kts` hinzu:
 
 ```kotlin
 dependencies {
-    // Database API
-    implementation("dev.spacetivity.tobi.database:database-api:VERSION")
+    // Database API (no Hytale dependencies - usable in Discord Bot, etc.)
+    implementation("dev.spacetivity.tobi.hylib.database:database-api:VERSION")
+    implementation("dev.spacetivity.tobi.hylib.database:database-common:VERSION")
     
-    // Annotation Processor für Config Codec Generation
-    annotationProcessor("dev.spacetivity.tobi.database:database-processor:VERSION")
+    // Hytale API (for CodecBuilder - requires Hytale dependencies)
+    implementation("dev.spacetivity.tobi.hylib.database:hytale-api:VERSION")
+    implementation("dev.spacetivity.tobi.hylib.database:hytale-common:VERSION")
     
     // Hytale Server (für BuilderCodec und Config)
     compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
@@ -127,7 +137,7 @@ repositories {
     
     maven {
         name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/spacetivity/game-database-lib")
+        url = uri("https://maven.pkg.github.com/spacetivity/hylib")
         credentials {
             username = project.findProperty("github.username") as String? 
                 ?: System.getenv("GITHUB_ACTOR")
@@ -144,10 +154,7 @@ repositories {
 
 dependencies {
     // Database API
-    implementation("dev.spacetivity.tobi.database:database-api:1.0.0")
-    
-    // Annotation Processor
-    annotationProcessor("dev.spacetivity.tobi.database:database-processor:1.0.0")
+    implementation("dev.spacetivity.tobi.hylib.database:database-api:1.0.0")
     
     // Hytale Server
     compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
@@ -165,12 +172,19 @@ dependencies {
 ### 1. API Initialization
 
 ```java
-MariaDbCredentials maria = new MariaDbCredentials(
+import dev.spacetivity.tobi.hylib.database.api.DatabaseProvider;
+import dev.spacetivity.tobi.hylib.database.api.connection.credentials.impl.MariaDbCredentials;
+import dev.spacetivity.tobi.hylib.database.common.DatabaseApiImpl;
+
+// Create and register the API
+DatabaseApi api = new DatabaseApiImpl();
+DatabaseProvider.register(api);
+
+// Establish connection (optional, can be done later)
+MariaDbCredentials credentials = new MariaDbCredentials(
     "localhost", 3306, "user", "database", "secret"
 );
-
-DatabaseApi api = new DatabaseApiImpl(maria);
-DatabaseProvider.register(api);
+api.establishConnection(credentials);
 ```
 
 ### 2. Connection Handling
@@ -214,7 +228,7 @@ String col = idColumn.toSql();  // `id`
 ### SELECT Queries
 
 ```java
-import dev.spacetivity.tobi.database.api.connection.impl.sql.builder.SqlBuilder;
+import dev.spacetivity.tobi.hylib.database.api.connection.impl.sql.builder.SqlBuilder;
 
 Table usersTable = Table.of("users");
 Column idCol = Column.of("id");
@@ -308,7 +322,7 @@ BuiltQuery deleteMulti = SqlBuilder
 The `RowMapper<T>` interface separates SQL logic from domain mapping:
 
 ```java
-import dev.spacetivity.tobi.database.api.connection.impl.sql.RowMapper;
+import dev.spacetivity.tobi.hylib.database.api.connection.impl.sql.RowMapper;
 
 public class User {
     private final int id;
@@ -348,8 +362,8 @@ List<User> users = query(query, userMapper);
 ### Creating a Base Repository
 
 ```java
-import dev.spacetivity.tobi.database.api.connection.impl.sql.*;
-import dev.spacetivity.tobi.database.api.repository.impl.AbstractMariaDbRepository;
+import dev.spacetivity.tobi.hylib.database.api.connection.impl.sql.*;
+import dev.spacetivity.tobi.hylib.database.api.repository.impl.AbstractMariaDbRepository;
 
 public class UserRepository extends AbstractMariaDbRepository<User> {
     
@@ -494,7 +508,7 @@ CompletableFuture<List<T>> getAllAsync()
 ## SQL Data Types
 
 ```java
-import dev.spacetivity.tobi.database.api.connection.impl.sql.SQLDataType;
+import dev.spacetivity.tobi.hylib.database.api.connection.impl.sql.SQLDataType;
 
 // Text Types
 SQLDataType.VARCHAR      // VARCHAR(255)
@@ -538,93 +552,92 @@ SQLColumn.from(Column.of("status"), "VARCHAR(50) DEFAULT 'active'")
 
 ## Config API
 
-The Config API provides type-safe configuration management using annotation-based codec generation. Config classes are automatically processed at compile-time to generate efficient codecs for serialization/deserialization.
+The Config API provides type-safe configuration management using a fluent DSL for building codecs. Codecs are created programmatically at runtime using method references.
 
 ### Features
 
-- **Annotation-based** - Simple `@AutoCodec` and `@CodecField` annotations
-- **Compile-time generation** - Codecs are generated during compilation for optimal performance
-- **Type-safe** - Full type checking at compile time
-- **Default values** - Support for optional fields with default values
+- **Fluent DSL** - Simple, readable API for building codecs
+- **Method References** - Type-safe getter/setter references
+- **Default Values** - Support for optional fields with default values
+- **Runtime Creation** - No compile-time code generation required
 - **Hytale integration** - Works seamlessly with Hytale's `Config<T>` system
 
 ### Quick Start
 
-#### 1. Repository und Dependencies hinzufügen
+#### 1. Create a Config Class
 
-Siehe [Installation](#installation) für die vollständige Anleitung zur Einrichtung des GitHub Packages Repositories.
-
-**Kurze Zusammenfassung:**
-
-1. Füge das GitHub Packages Repository hinzu (siehe [Installation](#installation))
-2. Füge die Dependencies hinzu:
-
-```kotlin
-dependencies {
-    // API für Annotationen und Interfaces
-    implementation("dev.spacetivity.tobi.database:database-api:1.0.0")
-    
-    // Annotation Processor für Codec-Generierung
-    annotationProcessor("dev.spacetivity.tobi.database:database-processor:1.0.0")
-    
-    // Hytale Server (für BuilderCodec und Config)
-    compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
-    
-    // Lombok (optional, aber empfohlen für Getter/Setter)
-    compileOnly("org.projectlombok:lombok:1.18.30")
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
-}
-```
-
-**Wichtig:** 
-- Ersetze `1.0.0` mit der gewünschten Version
-- Stelle sicher, dass das GitHub Packages Repository korrekt konfiguriert ist
-- Ein GitHub Token mit `read:packages` Berechtigung ist erforderlich
-
-#### 2. Create a Config Class
-
-Create a config class annotated with `@AutoCodec`:
+Create a config class with getters and setters:
 
 ```java
 package com.example.plugin.config;
 
-import dev.spacetivity.tobi.database.api.config.AutoCodec;
-import dev.spacetivity.tobi.database.api.config.CodecField;
 import lombok.Getter;
 import lombok.Setter;
 
-@AutoCodec
 @Getter
 @Setter
 public class MyPluginConfig {
     
-    @CodecField(value = "server-name", hasDefault = true, defaultValue = "MyServer")
-    private String serverName;
-    
-    @CodecField(value = "max-players", hasDefault = true, defaultValue = "100")
-    private int maxPlayers;
-    
-    @CodecField(value = "enabled", hasDefault = true, defaultValue = "true")
-    private boolean enabled;
-    
-    @CodecField(value = "api-key", hasDefault = false) // Kein Default = Pflichtfeld
+    private String serverName = "MyServer";
+    private int maxPlayers = 100;
+    private boolean enabled = true;
     private String apiKey;
+    private String databaseUrl = "jdbc:mariadb://localhost:3306/mydb";
+}
+```
+
+#### 2. Create a Codec
+
+Add a static `codec()` method to your config class. **Note:** `HytaleApi` must be initialized before calling `newCodec()`:
+
+```java
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
+
+public class MyPluginConfig {
+    // ... fields ...
     
-    @CodecField(value = "database-url", hasDefault = true, defaultValue = "jdbc:mariadb://localhost:3306/mydb")
-    private String databaseUrl;
+    public static BuilderCodec<MyPluginConfig> codec() {
+        return HytaleProvider.getApi().newCodec(MyPluginConfig.class)
+                .field("server-name", Codec.STRING, 
+                    MyPluginConfig::setServerName, 
+                    MyPluginConfig::getServerName)
+                    .withDefault("MyServer")
+                .and()
+                .field("max-players", Codec.INTEGER,
+                    MyPluginConfig::setMaxPlayers,
+                    MyPluginConfig::getMaxPlayers)
+                    .withDefault(100)
+                .and()
+                .field("enabled", Codec.BOOLEAN,
+                    MyPluginConfig::setEnabled,
+                    MyPluginConfig::isEnabled)
+                    .withDefault(true)
+                .and()
+                .field("api-key", Codec.STRING,
+                    MyPluginConfig::setApiKey,
+                    MyPluginConfig::getApiKey)
+                .and()
+                .field("database-url", Codec.STRING,
+                    MyPluginConfig::setDatabaseUrl,
+                    MyPluginConfig::getDatabaseUrl)
+                    .withDefault("jdbc:mariadb://localhost:3306/mydb")
+                .build();
+    }
 }
 ```
 
 #### 3. Use the Config
 
-##### Option A: Via DatabaseProvider (Recommended)
-
-If `DatabaseApi` is already initialized:
+**Important:** `HytaleApi` must be initialized before calling `newCodec()`. Initialize it in your plugin constructor:
 
 ```java
-import dev.spacetivity.tobi.database.api.DatabaseProvider;
-import dev.spacetivity.tobi.database.api.config.CodecLoader;
 import com.hypixel.hytale.server.core.util.Config;
+import dev.spacetivity.tobi.hylib.database.api.DatabaseProvider;
+import dev.spacetivity.tobi.hylib.database.common.DatabaseApiImpl;
+import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
+import dev.spacetivity.tobi.hylib.hytale.common.HytaleApiImpl;
 
 public class MyPlugin extends JavaPlugin {
     
@@ -633,11 +646,12 @@ public class MyPlugin extends JavaPlugin {
     public MyPlugin(JavaPluginInit init) {
         super(init);
         
-        // Get CodecLoader from DatabaseProvider
-        CodecLoader codecLoader = DatabaseProvider.getApi().getCodecLoader();
+        // Initialize DatabaseApi first
+        DatabaseApi api = new DatabaseApiImpl();
+        DatabaseProvider.register(api);
         
-        // Create config with generated codec
-        config = withConfig(codecLoader.codec(MyPluginConfig.class));
+        // Now you can create configs with codecs
+        config = withConfig("MyConfig", MyPluginConfig.codec());
     }
     
     @Override
@@ -662,123 +676,79 @@ public class MyPlugin extends JavaPlugin {
 }
 ```
 
-##### Option B: Direct CodecLoader Creation
+### CodecBuilder API
 
-If you need to use configs before `DatabaseApi` is initialized:
+The `CodecBuilder` provides a fluent DSL for building codecs. Codecs are created via `HytaleProvider.getApi().newCodec(Class<T>)`:
 
-```java
-import dev.spacetivity.tobi.database.api.config.CodecLoader;
-import dev.spacetivity.tobi.database.common.api.config.CodecLoaderImpl;
-import com.hypixel.hytale.server.core.util.Config;
-
-public class MyPlugin extends JavaPlugin {
-    
-    private Config<MyPluginConfig> config;
-    
-    public MyPlugin(JavaPluginInit init) {
-        super(init);
-        
-        // Create CodecLoader directly
-        CodecLoader codecLoader = new CodecLoaderImpl();
-        
-        // Create config with generated codec
-        config = withConfig(codecLoader.codec(MyPluginConfig.class));
-    }
-    
-    public MyPluginConfig getConfig() {
-        return config.get();
-    }
-}
-```
-
-### Annotation Reference
-
-#### @AutoCodec
-
-Marks a class for automatic codec generation. Must be applied to the class level.
+#### Basic Usage
 
 ```java
-@AutoCodec
-public class MyConfig {
-    // ...
-}
+BuilderCodec<MyConfig> codec = HytaleProvider.getApi().newCodec(MyConfig.class)
+    .field("key", Codec.STRING, MyConfig::setValue, MyConfig::getValue)
+    .build();
 ```
 
-**Requirements:**
-- Class must have a no-argument constructor
-- Fields must have getter/setter methods (use Lombok `@Getter`/`@Setter` or write manually)
-- Only fields annotated with `@CodecField` will be included in the codec
-
-#### @CodecField
-
-Marks a field to be included in the generated codec.
+#### With Default Value
 
 ```java
-@CodecField(value = "field-name", hasDefault = true, defaultValue = "default")
-private String fieldName;
+BuilderCodec<MyConfig> codec = HytaleProvider.getApi().newCodec(MyConfig.class)
+    .field("hostname", Codec.STRING, MyConfig::setHostname, MyConfig::getHostname)
+        .withDefault("localhost")
+    .build();
 ```
 
-**Parameters:**
-- `value` (required): The key name in the config file/object
-- `hasDefault` (optional, default: `false`): Whether this field has a default value
-- `defaultValue` (optional, default: `""`): The default value as a string (will be parsed according to field type)
+#### Multiple Fields
 
-**Field Requirements:**
-- Must have a getter method (e.g., `getFieldName()` or `isFieldName()` for booleans)
-- Must have a setter method (e.g., `setFieldName(value)`)
+```java
+BuilderCodec<MyConfig> codec = HytaleProvider.getApi().newCodec(MyConfig.class)
+    .field("hostname", Codec.STRING, MyConfig::setHostname, MyConfig::getHostname)
+        .withDefault("localhost")
+    .and()
+    .field("port", Codec.INTEGER, MyConfig::setPort, MyConfig::getPort)
+        .withDefault(3306)
+    .build();
+```
 
-### Supported Types
+### Supported Codec Types
 
-The annotation processor supports the following field types:
+The following Hytale `Codec` types are available:
 
 #### Primitive Types
-- `int` / `Integer`
-- `long` / `Long`
-- `double` / `Double`
-- `float` / `Float`
-- `boolean` / `Boolean`
-- `byte` / `Byte`
-- `short` / `Short`
+- `Codec.STRING`
+- `Codec.INTEGER`
+- `Codec.LONG`
+- `Codec.DOUBLE`
+- `Codec.FLOAT`
+- `Codec.BOOLEAN`
+- `Codec.BYTE`
+- `Codec.SHORT`
 
 #### Object Types
-- `String`
-- `java.util.UUID`
-- `java.time.Duration`
-- `java.time.Instant`
-- `java.nio.file.Path`
-- `java.util.logging.Level`
+- `Codec.UUID_STRING`
+- `Codec.DURATION`
+- `Codec.INSTANT`
+- `Codec.PATH`
+- `Codec.LOG_LEVEL`
 
-#### Enum Types
-Any enum type is automatically supported:
+#### Custom Codecs
 
-```java
-@CodecField(value = "mode", hasDefault = true, defaultValue = "NORMAL")
-private GameMode mode;
-
-public enum GameMode {
-    NORMAL, HARD, EXPERT
-}
-```
-
-### Default Values
-
-Default values are specified as strings and automatically parsed based on the field type:
+You can also use custom codecs from Hytale's codec system:
 
 ```java
-@CodecField(value = "port", hasDefault = true, defaultValue = "3306")
-private int port;  // Parsed as integer
+import com.hypixel.hytale.codec.FunctionCodec;
 
-@CodecField(value = "enabled", hasDefault = true, defaultValue = "true")
-private boolean enabled;  // Parsed as boolean
+// For enums
+FunctionCodec<GameMode> gameModeCodec = new FunctionCodec<>(
+    Codec.STRING, 
+    GameMode::valueOf, 
+    Enum::name
+);
 
-@CodecField(value = "timeout", hasDefault = true, defaultValue = "PT30S")
-private Duration timeout;  // Parsed as ISO-8601 duration
-
-@CodecField(value = "uuid", hasDefault = true, defaultValue = "550e8400-e29b-41d4-a716-446655440000")
-private UUID uuid;  // Parsed as UUID string
+BuilderCodec<MyConfig> codec = HytaleProvider.getApi().newCodec(MyConfig.class)
+    .field("mode", gameModeCodec, MyConfig::setMode, MyConfig::getMode)
+        .withDefault(GameMode.NORMAL)
+    .build();
 ```
-
-**Important:** Fields without `hasDefault = true` are **required** and will cause errors if missing in the config.
 
 ### Complete Example
 
@@ -787,39 +757,65 @@ Here's a complete example of a database configuration:
 ```java
 package com.example.plugin.config;
 
-import dev.spacetivity.tobi.database.api.config.AutoCodec;
-import dev.spacetivity.tobi.database.api.config.CodecField;
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import dev.spacetivity.tobi.hylib.database.api.DatabaseProvider;
 import lombok.Getter;
 import lombok.Setter;
 
-@AutoCodec
 @Getter
 @Setter
 public class DatabaseConfig {
     
-    @CodecField(value = "hostname", hasDefault = true, defaultValue = "localhost")
-    private String hostname;
-    
-    @CodecField(value = "port", hasDefault = true, defaultValue = "3306")
-    private int port;
-    
-    @CodecField(value = "database", hasDefault = false)
+    private String hostname = "localhost";
+    private int port = 3306;
     private String database;
-    
-    @CodecField(value = "username", hasDefault = false)
     private String username;
-    
-    @CodecField(value = "password", hasDefault = false)
     private String password;
+    private int poolSize = 10;
+    private java.time.Duration connectionTimeout = java.time.Duration.ofSeconds(30);
+    private boolean sslEnabled = false;
     
-    @CodecField(value = "pool-size", hasDefault = true, defaultValue = "10")
-    private int poolSize;
-    
-    @CodecField(value = "connection-timeout", hasDefault = true, defaultValue = "PT30S")
-    private java.time.Duration connectionTimeout;
-    
-    @CodecField(value = "ssl-enabled", hasDefault = true, defaultValue = "false")
-    private boolean sslEnabled;
+    public static BuilderCodec<DatabaseConfig> codec() {
+        return HytaleProvider.getApi().newCodec(DatabaseConfig.class)
+                .field("hostname", Codec.STRING, 
+                    DatabaseConfig::setHostname, 
+                    DatabaseConfig::getHostname)
+                    .withDefault("localhost")
+                .and()
+                .field("port", Codec.INTEGER,
+                    DatabaseConfig::setPort,
+                    DatabaseConfig::getPort)
+                    .withDefault(3306)
+                .and()
+                .field("database", Codec.STRING,
+                    DatabaseConfig::setDatabase,
+                    DatabaseConfig::getDatabase)
+                .and()
+                .field("username", Codec.STRING,
+                    DatabaseConfig::setUsername,
+                    DatabaseConfig::getUsername)
+                .and()
+                .field("password", Codec.STRING,
+                    DatabaseConfig::setPassword,
+                    DatabaseConfig::getPassword)
+                .and()
+                .field("pool-size", Codec.INTEGER,
+                    DatabaseConfig::setPoolSize,
+                    DatabaseConfig::getPoolSize)
+                    .withDefault(10)
+                .and()
+                .field("connection-timeout", Codec.DURATION,
+                    DatabaseConfig::setConnectionTimeout,
+                    DatabaseConfig::getConnectionTimeout)
+                    .withDefault(java.time.Duration.ofSeconds(30))
+                .and()
+                .field("ssl-enabled", Codec.BOOLEAN,
+                    DatabaseConfig::setSslEnabled,
+                    DatabaseConfig::isSslEnabled)
+                    .withDefault(false)
+                .build();
+    }
 }
 ```
 
@@ -833,8 +829,7 @@ public class DatabasePlugin extends JavaPlugin {
     public DatabasePlugin(JavaPluginInit init) {
         super(init);
         
-        CodecLoader codecLoader = DatabaseProvider.getApi().getCodecLoader();
-        dbConfig = withConfig(codecLoader.codec(DatabaseConfig.class));
+        dbConfig = withConfig("DatabaseConfig", DatabaseConfig.codec());
     }
     
     @Override
@@ -853,38 +848,10 @@ public class DatabasePlugin extends JavaPlugin {
         );
         
         // Initialize database with config
-        DatabaseApi api = new DatabaseApiImpl(credentials);
+        DatabaseApi api = new DatabaseApiImpl();
+        api.establishConnection(credentials);
         DatabaseProvider.register(api);
     }
-}
-```
-
-### How It Works
-
-1. **Compile-time Processing**: The `CodecProcessor` annotation processor scans for classes annotated with `@AutoCodec`
-2. **Code Generation**: For each config class, it generates a `{ClassName}_Codec` class containing a `BuilderCodec` instance
-3. **Runtime Loading**: `CodecLoaderImpl` loads the generated codec class and caches it
-4. **Config Usage**: The codec is used with Hytale's `Config<T>` system for type-safe configuration
-
-### Generated Code
-
-For a config class `MyConfig`, the processor generates `MyConfig_Codec`:
-
-```java
-// Generated automatically
-public final class MyConfig_Codec {
-    public static final BuilderCodec<MyConfig> CODEC =
-        BuilderCodec.builder(MyConfig.class, MyConfig::new)
-            .append(new KeyedCodec<>("server-name", Codec.STRING),
-                (obj, val, info) -> obj.setServerName(val != null ? val : "MyServer"),
-                (obj, info) -> obj.getServerName())
-            .add()
-            .append(new KeyedCodec<>("max-players", Codec.INTEGER),
-                (obj, val, info) -> obj.setMaxPlayers(val != null ? val : 100),
-                (obj, info) -> obj.getMaxPlayers())
-            .add()
-            // ... more fields
-            .build();
 }
 ```
 
@@ -893,7 +860,6 @@ public final class MyConfig_Codec {
 1. **Use Lombok**: Use `@Getter` and `@Setter` to avoid boilerplate:
 
 ```java
-@AutoCodec
 @Getter
 @Setter
 public class MyConfig {
@@ -901,44 +867,55 @@ public class MyConfig {
 }
 ```
 
-2. **Meaningful Field Names**: Use descriptive field names and config keys:
+2. **Static Codec Method**: Create a static `codec()` method in your config class:
+
+```java
+public class MyConfig {
+    // ... fields ...
+    
+    public static BuilderCodec<MyConfig> codec() {
+        return HytaleProvider.getApi().newCodec(MyConfig.class)
+            // ... fields ...
+            .build();
+    }
+}
+```
+
+3. **Meaningful Field Names**: Use descriptive field names and config keys:
 
 ```java
 // Good
-@CodecField(value = "max-concurrent-connections", hasDefault = true, defaultValue = "10")
-private int maxConcurrentConnections;
+.field("max-concurrent-connections", Codec.INTEGER, ...)
+    .withDefault(10)
 
 // Bad
-@CodecField(value = "mcc", hasDefault = true, defaultValue = "10")
-private int mcc;
+.field("mcc", Codec.INTEGER, ...)
+    .withDefault(10)
 ```
 
-3. **Required vs Optional**: Clearly mark required fields:
+4. **Required vs Optional**: Use `.withDefault()` for optional fields with defaults, or omit it for required fields:
 
 ```java
 // Required field (no default)
-@CodecField(value = "api-key", hasDefault = false)
-private String apiKey;
+.field("api-key", Codec.STRING, MyConfig::setApiKey, MyConfig::getApiKey)
 
 // Optional field (with default)
-@CodecField(value = "timeout", hasDefault = true, defaultValue = "PT30S")
-private Duration timeout;
+.field("timeout", Codec.DURATION, MyConfig::setTimeout, MyConfig::getTimeout)
+    .withDefault(Duration.ofSeconds(30))
+
+// Optional field (nullable - BuilderCodec handles null automatically)
+.field("password", Codec.STRING, MyConfig::setPassword, MyConfig::getPassword)
 ```
 
-4. **Group Related Configs**: Create separate config classes for different concerns:
+5. **Group Related Configs**: Create separate config classes for different concerns:
 
 ```java
-@AutoCodec
 public class DatabaseConfig { /* ... */ }
-
-@AutoCodec
 public class PluginConfig { /* ... */ }
-
-@AutoCodec
 public class FeatureConfig { /* ... */ }
 ```
 
-5. **Validate After Loading**: Check required fields after loading:
+6. **Validate After Loading**: Check required fields after loading:
 
 ```java
 DatabaseConfig config = dbConfig.get();
@@ -947,57 +924,6 @@ if (config.getApiKey() == null || config.getApiKey().isEmpty()) {
 }
 ```
 
-### Troubleshooting
-
-#### "No generated codec found"
-
-**Problem:** The annotation processor didn't generate the codec class.
-
-**Solutions:**
-- Ensure `database-processor` is in `annotationProcessor` dependencies (not `compileOnly`)
-- Rebuild the project (clean + build)
-- Check that the class is annotated with `@AutoCodec`
-- Verify that fields have getter/setter methods
-
-#### "IllegalStateException: Api instance is null"
-
-**Problem:** `DatabaseProvider.getApi()` is called before `DatabaseProvider.register()`.
-
-**Solutions:**
-- Initialize `DatabaseApi` before accessing `DatabaseProvider.getApi()`
-- Or use `new CodecLoaderImpl()` directly if you need configs before API initialization
-
-#### Default values not working
-
-**Problem:** Default values are not applied.
-
-**Solutions:**
-- Ensure `hasDefault = true` is set
-- Check that `defaultValue` matches the field type format
-- Verify the default value can be parsed (e.g., valid UUID format, valid Duration format)
-
-### Advanced Usage
-
-#### Custom Codec Building (Manual)
-
-If you need more control, you can build codecs manually using `CodecBuilderDSL`:
-
-```java
-import dev.spacetivity.tobi.database.common.api.config.CodecBuilderDSL;
-import com.hypixel.hytale.codec.Codec;
-
-BuilderCodec<MyConfig> codec = CodecBuilderDSL.of(MyConfig.class)
-    .field("server-name", Codec.STRING, 
-        MyConfig::setServerName, 
-        MyConfig::getServerName)
-    .field("max-players", Codec.INTEGER,
-        MyConfig::setMaxPlayers,
-        MyConfig::getMaxPlayers)
-    .build();
-```
-
-However, using `@AutoCodec` is recommended for most use cases.
-
 ---
 
 ## Cache API
@@ -1005,7 +931,7 @@ However, using `@AutoCodec` is recommended for most use cases.
 ### In-Memory Cache
 
 ```java
-import dev.spacetivity.tobi.database.api.cache.AbstractInMemoryCache;
+import dev.spacetivity.tobi.hylib.database.api.cache.AbstractInMemoryCache;
 
 public class LocalUserCache extends AbstractInMemoryCache<String, User> {
     // Optional: Custom Logic
@@ -1071,6 +997,7 @@ Table usersTable = Table.of("users");
 ## Important Notes
 
 - `DatabaseProvider.getApi()` throws `IllegalStateException` if no instance has been registered
+- `HytaleProvider.getApi().newCodec()` requires `HytaleApi` to be initialized first
 - `DatabaseConnector#getSafeConnection()` throws `NullPointerException` if no connection exists
 - Dependencies for MariaDB are `compileOnly` - must be provided at runtime
 - Table/Column identifiers are validated at compile time
@@ -1095,11 +1022,8 @@ For using the Config API in your project:
 
 ```gradle
 dependencies {
-    // API für Annotationen und Interfaces
-    implementation("dev.spacetivity.tobi.database:database-api:1.0-SNAPSHOT")
-    
-    // Annotation Processor für Codec-Generierung (wichtig: annotationProcessor, nicht compileOnly!)
-    annotationProcessor("dev.spacetivity.tobi.database:database-processor:1.0-SNAPSHOT")
+    // Database API
+    implementation("dev.spacetivity.tobi.hylib.database:database-api:1.0-SNAPSHOT")
     
     // Hytale Server (für BuilderCodec und Config)
     compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
@@ -1109,8 +1033,6 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:...")
 }
 ```
-
-**Important:** The `database-processor` must be in `annotationProcessor` dependencies, not `compileOnly`, otherwise codec generation won't work!
 
 ---
 

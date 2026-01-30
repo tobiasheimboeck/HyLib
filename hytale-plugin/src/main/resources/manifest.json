@@ -1,0 +1,16 @@
+{
+    "Group": "dev.spacetivity.tobi.hylib.hytale.plugin",
+    "Name": "HyLib",
+    "Version": "1.0.0",
+    "Description": "Hytale utility library with database support",
+    "Main": "dev.spacetivity.tobi.hylib.hytale.plugin.DatabaseHytalePlugin",
+    "Author": [
+        {
+            "Name": "TGamings",
+            "Email": "tobias.heimboeck@nexalit.at",
+            "Url": "discord.spacetivity.dev"
+        }
+    ],
+    "ServerVersion": ">=1.0.0",
+    "IncludeAssetPack": true
+}

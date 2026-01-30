@@ -3,12 +3,12 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.tasks.Jar
 
 dependencies {
-    compileOnly(libs.gson)
+    implementation(project(":hytale-api"))
+    
+    implementation(libs.hytale.server)
+    
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
-    compileOnly(libs.mariadb.jdbc)
-    compileOnly(libs.hikaricp)
-
 }
 
 tasks.named<Jar>("jar") {
@@ -17,6 +17,7 @@ tasks.named<Jar>("jar") {
             if (file.isDirectory) file else zipTree(file)
         }
     )
+    dependsOn(":hytale-api:jar")
     from(rootProject.file("LICENSE"))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
@@ -28,12 +29,12 @@ publishing {
             from(components["java"])
             
             groupId = project.group.toString()
-            artifactId = "database-api"
+            artifactId = "hytale-common"
             version = project.version.toString()
             
             pom {
-                name.set("Database API")
-                description.set("Type-safe database API with SQL injection protection")
+                name.set("Hytale Common")
+                description.set("Default implementations for Hytale API")
                 url.set("https://github.com/${project.findProperty("github.owner")}/${project.findProperty("github.repo")}")
                 
                 licenses {

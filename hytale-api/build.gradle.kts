@@ -3,12 +3,9 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.tasks.Jar
 
 dependencies {
-    compileOnly(libs.gson)
+    compileOnly(libs.hytale.server)
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
-    compileOnly(libs.mariadb.jdbc)
-    compileOnly(libs.hikaricp)
-
 }
 
 tasks.named<Jar>("jar") {
@@ -28,12 +25,12 @@ publishing {
             from(components["java"])
             
             groupId = project.group.toString()
-            artifactId = "database-api"
+            artifactId = "hytale-api"
             version = project.version.toString()
             
             pom {
-                name.set("Database API")
-                description.set("Type-safe database API with SQL injection protection")
+                name.set("Hytale API")
+                description.set("Hytale-specific API for codec building and configuration")
                 url.set("https://github.com/${project.findProperty("github.owner")}/${project.findProperty("github.repo")}")
                 
                 licenses {

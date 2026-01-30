@@ -48,19 +48,9 @@ jobs:
           # Ersetze version in build.gradle.kts
           sed -i "s/version = \".*\"/version = \"$VERSION\"/" build.gradle.kts
       
-      - name: Publish database-api to GitHub Packages
+      - name: Publish modules to GitHub Packages
         run: |
-          ./gradlew :database-api:publish \
-            -Pgithub.owner=${{ github.repository_owner }} \
-            -Pgithub.repo=${{ github.event.repository.name }} \
-            -Pgithub.username=${{ github.actor }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
-      
-      - name: Publish database-processor to GitHub Packages
-        run: |
-          ./gradlew :database-processor:publish \
+          ./gradlew :database-api:publish :database-common:publish :hytale-api:publish :hytale-common:publish \
             -Pgithub.owner=${{ github.repository_owner }} \
             -Pgithub.repo=${{ github.event.repository.name }} \
             -Pgithub.username=${{ github.actor }}

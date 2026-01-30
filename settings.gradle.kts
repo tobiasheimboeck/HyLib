@@ -1,2 +1,2 @@
-rootProject.name = "game-database-lib"
-include("database-api", "database-common", "database-hytale-plugin", "database-processor")
+rootProject.name = "HyLib"
+include("database-api", "database-common", "hytale-api", "hytale-common", "hytale-plugin")

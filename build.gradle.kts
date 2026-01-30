@@ -7,7 +7,7 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.testing.Test
 
 allprojects {
-    group = "dev.spacetivity.tobi.database"
+    group = "dev.spacetivity.tobi.hylib"
     version = "1.0-SNAPSHOT"
 
     repositories {

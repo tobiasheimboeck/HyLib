@@ -1,6 +1,6 @@
 # Publishing zu GitHub Packages
 
-Diese Anleitung erklärt, wie du `database-api` und `database-processor` zu GitHub Packages veröffentlichst.
+Diese Anleitung erklärt, wie du die HyLib Module zu GitHub Packages veröffentlichst.
 
 ## Voraussetzungen
 
@@ -28,7 +28,7 @@ Bearbeite `gradle.properties`:
 
 ```properties
 github.owner=dein-username-oder-org
-github.repo=game-database-lib
+github.repo=hylib
 github.username=dein-username
 github.token=dein-personal-access-token
 ```
@@ -48,14 +48,8 @@ allprojects {
 ### 3. Packages veröffentlichen
 
 ```bash
-# Nur database-api
-./gradlew :database-api:publish
-
-# Nur database-processor
-./gradlew :database-processor:publish
-
-# Beide gleichzeitig
-./gradlew :database-api:publish :database-processor:publish
+# Alle Module veröffentlichen
+./gradlew :database-api:publish :database-common:publish :hytale-api:publish :hytale-common:publish
 ```
 
 ### 4. Packages verwenden
@@ -103,8 +97,7 @@ export GITHUB_TOKEN=dein-github-personal-access-token
 
 ```kotlin
 dependencies {
-    implementation("dev.spacetivity.tobi.database:database-api:1.0.0")
-    annotationProcessor("dev.spacetivity.tobi.database:database-processor:1.0.0")
+    implementation("dev.spacetivity.tobi.hylib.database:database-api:1.0.0")
     
     // Weitere Dependencies...
 }
@@ -200,7 +193,7 @@ repositories {
 
 **Ersetze:**
 - `OWNER`: Dein GitHub Username oder Organisation (z.B. `spacetivity`)
-- `REPO`: Repository Name (z.B. `game-database-lib`)
+- `REPO`: Repository Name (z.B. `hylib`)
 
 #### Schritt 2: Authentifizierung einrichten
 
@@ -244,10 +237,7 @@ Füge die Dependencies zu deiner `build.gradle.kts` hinzu:
 ```kotlin
 dependencies {
     // Database API
-    implementation("dev.spacetivity.tobi.database:database-api:VERSION")
-    
-    // Annotation Processor für Config Codec Generation
-    annotationProcessor("dev.spacetivity.tobi.database:database-processor:VERSION")
+    implementation("dev.spacetivity.tobi.hylib.database:database-api:VERSION")
     
     // Hytale Server (für BuilderCodec und Config)
     compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
@@ -286,7 +276,7 @@ repositories {
     // GitHub Packages
     maven {
         name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/spacetivity/game-database-lib")
+        url = uri("https://maven.pkg.github.com/spacetivity/hylib")
         credentials {
             username = project.findProperty("github.username") as String? 
                 ?: System.getenv("GITHUB_ACTOR")
@@ -308,10 +298,7 @@ repositories {
 
 dependencies {
     // Database API
-    implementation("dev.spacetivity.tobi.database:database-api:1.0.0")
-    
-    // Annotation Processor
-    annotationProcessor("dev.spacetivity.tobi.database:database-processor:1.0.0")
+    implementation("dev.spacetivity.tobi.hylib.database:database-api:1.0.0")
     
     // Hytale Server
     compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
@@ -346,8 +333,10 @@ Wenn du die Packages in GitHub Actions verwendest, wird `GITHUB_TOKEN` automatis
 
 Nach dem Publishing sind die Packages verfügbar unter:
 
-- **database-api**: `https://github.com/{owner}/{repo}/packages/maven/dev.spacetivity.tobi.database/database-api`
-- **database-processor**: `https://github.com/{owner}/{repo}/packages/maven/dev.spacetivity.tobi.database/database-processor`
+- **database-api**: `https://github.com/{owner}/{repo}/packages/maven/dev.spacetivity.tobi.hylib.database/database-api`
+- **database-common**: `https://github.com/{owner}/{repo}/packages/maven/dev.spacetivity.tobi.hylib.database/database-common`
+- **hytale-api**: `https://github.com/{owner}/{repo}/packages/maven/dev.spacetivity.tobi.hylib.database/hytale-api`
+- **hytale-common**: `https://github.com/{owner}/{repo}/packages/maven/dev.spacetivity.tobi.hylib.database/hytale-common`
 
 ## Weitere Informationen
 
