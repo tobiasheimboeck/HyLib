@@ -34,8 +34,7 @@ public class DatabaseHytalePlugin extends JavaPlugin {
         this.dbConfig.save();
 
         DbConfig config = dbConfig.get();
-        MariaDbCredentials credentials = new MariaDbCredentials(config.getHostname(), config.getPort(),
-                config.getDatabase(), config.getUsername(), config.getPassword());
+        MariaDbCredentials credentials = new MariaDbCredentials(config.getHostname(), config.getPort(), config.getDatabase(), config.getUsername(), config.getPassword());
 
         dbApi.establishConnection(credentials);
     }
