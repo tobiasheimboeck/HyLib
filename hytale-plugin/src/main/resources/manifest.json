@@ -2,7 +2,7 @@
     "Group": "dev.spacetivity.tobi.hylib.hytale.plugin",
     "Name": "HyLib",
     "Version": "1.0.0",
-    "Description": "Hytale utility library with database support",
+    "Description": "Hytale utility library",
     "Main": "dev.spacetivity.tobi.hylib.hytale.plugin.DatabaseHytalePlugin",
     "Author": [
         {
@@ -11,6 +11,6 @@
             "Url": "discord.spacetivity.dev"
         }
     ],
-    "ServerVersion": ">=1.0.0",
+    "ServerVersion": "*",
     "IncludeAssetPack": true
 }

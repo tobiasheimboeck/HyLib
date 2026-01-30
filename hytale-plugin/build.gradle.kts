@@ -20,12 +20,13 @@ dependencies {
 
 tasks.named<Jar>("jar") {
     isZip64 = true
-    // Exclude Hytale Server and other compileOnly dependencies
+    // Include all runtime dependencies except Hytale Server and lombok
     from(
         configurations.runtimeClasspath.get().filter { file ->
-            val fileName = file.name
-            !fileName.contains("hytale") && 
-            !fileName.contains("Server") &&
+            val fileName = file.name.lowercase()
+            // Exclude only Hytale Server JARs and lombok
+            // Our project modules (hytale-api, hytale-common, database-*) will be included
+            !fileName.contains("server") && 
             !fileName.contains("lombok")
         }.map { file ->
             if (file.isDirectory) {
@@ -49,6 +50,8 @@ tasks.named<Jar>("jar") {
         }
     )
     dependsOn(":database-common:jar")
+    dependsOn(":database-api:jar")
+    dependsOn(":hytale-api:jar")
     dependsOn(":hytale-common:jar")
     from(rootProject.file("LICENSE"))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
