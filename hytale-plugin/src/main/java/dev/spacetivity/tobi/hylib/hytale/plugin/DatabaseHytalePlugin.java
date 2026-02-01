@@ -1,8 +1,5 @@
 package dev.spacetivity.tobi.hylib.hytale.plugin;
 
-import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.util.Config;
@@ -10,9 +7,7 @@ import dev.spacetivity.tobi.hylib.database.api.DatabaseProvider;
 import dev.spacetivity.tobi.hylib.database.api.connection.credentials.impl.MariaDbCredentials;
 import dev.spacetivity.tobi.hylib.database.common.DatabaseApiImpl;
 import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
-import dev.spacetivity.tobi.hylib.hytale.api.event.EventHandler;
 import dev.spacetivity.tobi.hylib.hytale.common.HytaleApiImpl;
-import dev.spacetivity.tobi.hylib.hytale.common.api.event.EventRegistrar;
 import dev.spacetivity.tobi.hylib.hytale.plugin.config.DbConfig;
 
 public class DatabaseHytalePlugin extends JavaPlugin {
@@ -23,13 +18,13 @@ public class DatabaseHytalePlugin extends JavaPlugin {
     public DatabaseHytalePlugin(JavaPluginInit init) {
         super(init);
 
-        dbApi = new DatabaseApiImpl();
-        DatabaseProvider.register(dbApi);
+        this.dbApi = new DatabaseApiImpl();
+        DatabaseProvider.register(this.dbApi);
 
         HytaleApiImpl hytaleApi = new HytaleApiImpl();
         HytaleProvider.register(hytaleApi);
 
-        dbConfig = withConfig("DbConfig", DbConfig.CODEC);
+        this.dbConfig = withConfig("DbConfig", DbConfig.CODEC);
     }
 
     @Override
@@ -39,9 +34,9 @@ public class DatabaseHytalePlugin extends JavaPlugin {
         this.dbConfig.save();
 
         DbConfig config = dbConfig.get();
-        MariaDbCredentials credentials = new MariaDbCredentials(config.getHostname(), config.getPort(), config.getDatabase(), config.getUsername(), config.getPassword());
+        MariaDbCredentials credentials = new MariaDbCredentials(config.getHostname(), config.getPort(), config.getUsername(), config.getDatabase(), config.getPassword());
 
-        dbApi.establishConnection(credentials);
+        this.dbApi.establishConnection(credentials);
     }
 
 }
