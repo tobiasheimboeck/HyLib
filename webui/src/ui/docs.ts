@@ -12,9 +12,11 @@ export function createDocsSection(): HTMLElement {
   toggle.innerHTML = '<span class="docs-arrow">▶</span> Supported Tags';
   toggle.setAttribute("aria-expanded", "false");
 
+  const contentWrapper = document.createElement("div");
+  contentWrapper.className = "docs-content-wrapper";
+
   const content = document.createElement("div");
   content.className = "docs-content";
-  content.hidden = true;
 
   content.innerHTML = `
     <p>Same format as <code>HyMessages.parse()</code> in HyLib.</p>
@@ -40,13 +42,13 @@ export function createDocsSection(): HTMLElement {
   `;
 
   toggle.addEventListener("click", () => {
-    const expanded = content.hidden;
-    content.hidden = !expanded;
-    toggle.setAttribute("aria-expanded", String(!expanded));
+    const expanded = contentWrapper.classList.toggle("expanded");
+    toggle.setAttribute("aria-expanded", String(expanded));
     (toggle.querySelector(".docs-arrow") as HTMLElement).textContent = expanded ? "▼" : "▶";
   });
 
+  contentWrapper.appendChild(content);
   section.appendChild(toggle);
-  section.appendChild(content);
+  section.appendChild(contentWrapper);
   return section;
 }

@@ -216,7 +216,19 @@ textarea:focus {
   color: var(--accent-hover);
 }
 
+.docs-content-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.docs-content-wrapper.expanded {
+  grid-template-rows: 1fr;
+}
+
 .docs-content {
+  min-height: 0;
+  overflow: hidden;
   margin-top: 1rem;
   font-size: 0.85rem;
   color: var(--text-muted);
