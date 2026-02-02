@@ -7,6 +7,11 @@ import "./style.css";
 import { createInputSection } from "./ui/input.js";
 import { createPreviewSection } from "./ui/preview.js";
 import { createDocsSection } from "./ui/docs.js";
+import { createPlaceholdersSection } from "./ui/placeholders.js";
+import { createTemplatesSection } from "./ui/templates.js";
+import { createValidationSection } from "./ui/validation.js";
+import { parsePlaceholderMap, applyPlaceholders } from "./utils/placeholders.js";
+import { validate } from "./utils/validator.js";
 
 // Optional: restore from URL hash (#m=...)
 function getInitialFromHash(): string {
@@ -54,21 +59,58 @@ headerRow.appendChild(h1);
 headerRow.appendChild(buttonGroup);
 app.appendChild(headerRow);
 
-const { container: preview, update } = createPreviewSection();
+const { container: preview, update: updatePreview } = createPreviewSection();
+const { container: validationContainer, update: updateValidation } = createValidationSection();
+
+let placeholdersValue = "";
 
 const inputSection = createInputSection(initial, (value) => {
-  update(value);
   updateHash(value);
+  refreshPreviewAndValidation();
 });
 
+const placeholdersSection = createPlaceholdersSection("", (value) => {
+  placeholdersValue = value;
+  refreshPreviewAndValidation();
+});
+
+const templatesSection = createTemplatesSection((value) => {
+  const textarea = inputSection.querySelector("textarea") as HTMLTextAreaElement;
+  textarea.value = value;
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+});
+
+function getSubstitutedText(): string {
+  const textarea = inputSection.querySelector("textarea") as HTMLTextAreaElement;
+  const raw = textarea?.value ?? "";
+  const map = parsePlaceholderMap(placeholdersValue);
+  return applyPlaceholders(raw, map);
+}
+
+function refreshPreviewAndValidation(): void {
+  const substituted = getSubstitutedText();
+  try {
+    updatePreview(substituted);
+  } catch (e) {
+    updatePreview("");
+    (preview.querySelector(".preview-box") as HTMLElement).textContent =
+      `Error: ${e instanceof Error ? e.message : String(e)}`;
+  }
+  const warnings = validate(substituted);
+  updateValidation(warnings);
+}
+
+app.appendChild(templatesSection);
 app.appendChild(inputSection);
+app.appendChild(placeholdersSection);
 app.appendChild(preview);
+app.appendChild(validationContainer);
 app.appendChild(createDocsSection());
 
 // Initial render
-update(initial);
+refreshPreviewAndValidation();
 
-// Copy button
+// Copy button – copies raw tag string (for use in Lang files)
 const copyBtnLabel = () => copyBtn.querySelector(".mainBar__cta-btn__label")!;
 copyBtn.addEventListener("click", async () => {
   const textarea = inputSection.querySelector("textarea") as HTMLTextAreaElement;
@@ -87,6 +129,19 @@ copyBtn.addEventListener("click", async () => {
 clearBtn.addEventListener("click", () => {
   const textarea = inputSection.querySelector("textarea") as HTMLTextAreaElement;
   textarea.value = "";
-  update("");
+  refreshPreviewAndValidation();
   updateHash("");
+});
+
+// Keyboard shortcuts
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      copyBtn.click();
+    } else if (e.key === "k") {
+      e.preventDefault();
+      clearBtn.click();
+    }
+  }
 });

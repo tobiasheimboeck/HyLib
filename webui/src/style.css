@@ -70,9 +70,108 @@ h1 {
   letter-spacing: 0.02em;
 }
 
+/* Templates */
+.templates-section {
+  margin-bottom: 1rem;
+}
+
+.templates-section label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.templates-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.template-btn {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-family: inherit;
+  font-weight: 500;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.template-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Placeholders */
+.placeholders-section {
+  margin-bottom: 1rem;
+}
+
+.placeholders-section label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.placeholders-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.placeholders-input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0.6rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  resize: vertical;
+}
+
+/* Validation */
+.validation-section {
+  margin-bottom: 1rem;
+}
+
+.validation-box {
+  padding: 0.6rem;
+  font-size: 0.85rem;
+  background: rgba(170, 0, 0, 0.15);
+  border: 1px solid rgba(255, 85, 85, 0.4);
+  border-radius: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.validation-box:empty,
+.validation-box[hidden] {
+  display: none;
+}
+
+.validation-warning {
+  color: #ff8888;
+}
+
 /* Input area */
 .input-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .input-section label {
@@ -324,6 +423,16 @@ textarea:focus {
   margin: 0 0 0.5rem;
   font-weight: 500;
   color: var(--text);
+}
+
+.app-footer__link {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.app-footer__link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
 }
 
 .app-footer__disclaimer {

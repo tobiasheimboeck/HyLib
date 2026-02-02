@@ -20,6 +20,7 @@ export function createDocsSection(): HTMLElement {
 
   content.innerHTML = `
     <p>Same format as <code>HyMessages.parse()</code> in HyLib.</p>
+    <p><strong>Shortcuts:</strong> Ctrl+Enter = Copy, Ctrl+K = Clear</p>
     <table>
       <thead>
         <tr>

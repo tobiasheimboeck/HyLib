@@ -82,11 +82,30 @@ function createToolbar(textarea: HTMLTextAreaElement): HTMLElement {
   });
   bar.appendChild(colorSelect);
 
-  const gradientBtn = document.createElement("button");
-  gradientBtn.textContent = "Gradient";
-  gradientBtn.type = "button";
-  gradientBtn.addEventListener("click", () => insert("<gradient:red:blue>", "</gradient>"));
-  bar.appendChild(gradientBtn);
+  const gradientPresets: [string, string][] = [
+    ["Gradient: Red→Blue", "red:blue"],
+    ["Gradient: Red→Yellow→Green", "red:yellow:green"],
+    ["Gradient: Rainbow", "red:yellow:green:aqua:blue:light_purple"],
+    ["Gradient: Gold→Red", "gold:red"],
+    ["Gradient: Aqua→Blue", "aqua:blue"],
+  ];
+
+  const gradientSelect = document.createElement("select");
+  gradientSelect.innerHTML = "<option value=''>Gradient…</option>";
+  for (const [label, colors] of gradientPresets) {
+    const opt = document.createElement("option");
+    opt.value = colors;
+    opt.textContent = label;
+    gradientSelect.appendChild(opt);
+  }
+  gradientSelect.addEventListener("change", () => {
+    const v = gradientSelect.value;
+    if (v) {
+      insert(`<gradient:${v}>`, "</gradient>");
+      gradientSelect.value = "";
+    }
+  });
+  bar.appendChild(gradientSelect);
 
   const linkBtn = document.createElement("button");
   linkBtn.textContent = "Link";
