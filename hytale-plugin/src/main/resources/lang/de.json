@@ -1,0 +1,11 @@
+{
+  "player.welcome": "Willkommen {0}!",
+  "player.goodbye": "Auf Wiedersehen {0}!",
+  "player.language_set": "Deine Sprache wurde auf {0} gesetzt",
+  "player.language_changed": "Deine Sprache wurde auf {0} geändert",
+  "error.not_found": "Spieler {0} nicht gefunden",
+  "error.invalid_language": "Ungültiger Sprachcode: {0}",
+  "command.usage": "Verwendung: /{0} {1}",
+  "command.language.set": "Sprache auf {0} gesetzt",
+  "command.language.available": "Verfügbare Sprachen: {0}"
+}

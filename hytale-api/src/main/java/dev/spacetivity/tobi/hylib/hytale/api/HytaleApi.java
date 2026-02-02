@@ -1,6 +1,7 @@
 package dev.spacetivity.tobi.hylib.hytale.api;
 
 import dev.spacetivity.tobi.hylib.hytale.api.config.CodecBuilder;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Localization;
 
 /**
  * Main API interface for Hytale-specific functionality.
@@ -8,6 +9,7 @@ import dev.spacetivity.tobi.hylib.hytale.api.config.CodecBuilder;
  * <p>This interface provides access to Hytale-specific features including:
  * <ul>
  *   <li>Codec building for type-safe configuration</li>
+ *   <li>Localization and translation functionality</li>
  * </ul>
  * 
  * <p>Instances of this interface should be obtained via {@link HytaleProvider#getApi()}
@@ -23,10 +25,12 @@ import dev.spacetivity.tobi.hylib.hytale.api.config.CodecBuilder;
  * // Use the API
  * HytaleApi api = HytaleProvider.getApi();
  * CodecBuilder<MyConfig> builder = api.newCodec(MyConfig.class);
+ * Localization loc = api.getLocalization();
  * }</pre>
  * 
  * @see HytaleProvider
  * @see CodecBuilder
+ * @see Localization
  * @since 1.0
  */
 public interface HytaleApi {
@@ -71,5 +75,46 @@ public interface HytaleApi {
      * @see CodecBuilder#field(String, com.hypixel.hytale.codec.Codec, java.util.function.BiConsumer, java.util.function.Function)
      */
     <T> CodecBuilder<T> newCodec(Class<T> clazz);
+
+    /**
+     * Gets the localization API for translation functionality.
+     * 
+     * <p>This method returns the localization instance that provides translation
+     * capabilities with support for multiple languages, placeholders, and fallback handling.
+     * 
+     * <h3>Example</h3>
+     * 
+     * <pre>{@code
+     * HytaleApi api = HytaleProvider.getApi();
+     * Localization loc = api.getLocalization();
+     * String message = loc.translate("player.welcome", "en", player.getName());
+     * }</pre>
+     * 
+     * @return the localization API instance, never null
+     * @throws IllegalStateException if localization has not been initialized
+     * @see Localization
+     */
+    Localization getLocalization();
+
+    /**
+     * Gets the HyPlayer service for managing player data.
+     * 
+     * <p>This method returns the service that provides access to player information
+     * including language preferences.
+     * 
+     * <h3>Example</h3>
+     * 
+     * <pre>{@code
+     * HytaleApi api = HytaleProvider.getApi();
+     * HyPlayerService service = api.getHyPlayerService();
+     * HyPlayer player = service.getOnlineHyPlayer(uuid);
+     * String language = player.getLanguage();
+     * }</pre>
+     * 
+     * @return the HyPlayer service instance, never null
+     * @throws IllegalStateException if the service has not been initialized
+     * @see dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService
+     */
+    dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService getHyPlayerService();
 
 }

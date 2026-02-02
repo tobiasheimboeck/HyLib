@@ -7,8 +7,9 @@ tasks.named("sourcesJar") {
 }
 
 dependencies {
+    compileOnly(project(":database-api"))
     implementation(project(":database-common"))
-    implementation(project(":database-api"))
+
     implementation(project(":hytale-api"))
     implementation(project(":hytale-common"))
     compileOnly(libs.hytale.server)

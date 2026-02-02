@@ -4,8 +4,12 @@ import org.gradle.jvm.tasks.Jar
 
 dependencies {
     implementation(project(":hytale-api"))
+    implementation(project(":database-api"))
     
-    implementation(libs.hytale.server)
+    compileOnly(libs.mariadb.jdbc)
+    compileOnly(libs.hytale.server)
+    compileOnly(libs.hikaricp) // Available transitively via database-common in hytale-plugin
+    implementation(libs.gson)
     
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
@@ -18,6 +22,7 @@ tasks.named<Jar>("jar") {
         }
     )
     dependsOn(":hytale-api:jar")
+    dependsOn(":database-api:jar")
     from(rootProject.file("LICENSE"))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
