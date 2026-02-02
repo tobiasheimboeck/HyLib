@@ -24,6 +24,9 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background-color: #10233f;
   background-image: url("https://hytale.com/static/images/backgrounds/content-upper-new-1920.jpg");
@@ -32,7 +35,6 @@ body {
   background-repeat: no-repeat;
   background-attachment: fixed;
   color: var(--text);
-  min-height: 100vh;
   line-height: 1.5;
   font-weight: 400;
   position: relative;
@@ -53,7 +55,9 @@ body > * {
 }
 
 #app {
+  flex: 1;
   max-width: 900px;
+  width: 100%;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -241,7 +245,7 @@ textarea:focus {
 }
 
 /* mainBar CTA button - matches Hytale navbar Purchase button */
-.copy-btn.mainBar__cta-btn {
+.mainBar__cta-btn {
   display: inline-block;
   position: relative;
   z-index: 0;
@@ -258,11 +262,11 @@ textarea:focus {
   transition: background 0.2s;
 }
 
-.copy-btn.mainBar__cta-btn:hover {
+.mainBar__cta-btn:hover {
   background: linear-gradient(to bottom, #378abd, #296799);
 }
 
-.copy-btn.mainBar__cta-btn .mainBar__cta-btn__label {
+.mainBar__cta-btn .mainBar__cta-btn__label {
   display: inline-block;
   font-family: "Lexend", sans-serif;
   font-weight: 700;
@@ -272,6 +276,12 @@ textarea:focus {
   letter-spacing: 0.08em;
 }
 
+.header-row__buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .header-row {
   display: flex;
   align-items: center;
@@ -279,4 +289,29 @@ textarea:focus {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
+}
+
+/* Footer */
+.app-footer {
+  margin-top: auto;
+  padding: 1.5rem 2rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  background: rgba(18, 24, 61, 0.5);
+}
+
+.app-footer__credit {
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.app-footer__disclaimer {
+  margin: 0;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
 }

@@ -41,8 +41,17 @@ const copyBtn = document.createElement("button");
 copyBtn.className = "copy-btn mainBar__cta-btn";
 copyBtn.innerHTML = `<span class="mainBar__cta-btn__label">Copy</span>`;
 
+const clearBtn = document.createElement("button");
+clearBtn.className = "clear-btn mainBar__cta-btn";
+clearBtn.innerHTML = `<span class="mainBar__cta-btn__label">Clear</span>`;
+
+const buttonGroup = document.createElement("div");
+buttonGroup.className = "header-row__buttons";
+buttonGroup.appendChild(clearBtn);
+buttonGroup.appendChild(copyBtn);
+
 headerRow.appendChild(h1);
-headerRow.appendChild(copyBtn);
+headerRow.appendChild(buttonGroup);
 app.appendChild(headerRow);
 
 const { container: preview, update } = createPreviewSection();
@@ -72,4 +81,12 @@ copyBtn.addEventListener("click", async () => {
     copyBtnLabel().textContent = "Failed";
     setTimeout(() => { copyBtnLabel().textContent = "Copy"; }, 1500);
   }
+});
+
+// Clear button
+clearBtn.addEventListener("click", () => {
+  const textarea = inputSection.querySelector("textarea") as HTMLTextAreaElement;
+  textarea.value = "";
+  update("");
+  updateHash("");
 });
