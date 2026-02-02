@@ -38,8 +38,8 @@ const h1 = document.createElement("h1");
 h1.textContent = "HyLib Message Preview";
 
 const copyBtn = document.createElement("button");
-copyBtn.className = "copy-btn";
-copyBtn.textContent = "Copy";
+copyBtn.className = "copy-btn mainBar__cta-btn";
+copyBtn.innerHTML = `<span class="mainBar__cta-btn__label">Copy</span>`;
 
 headerRow.appendChild(h1);
 headerRow.appendChild(copyBtn);
@@ -60,15 +60,16 @@ app.appendChild(createDocsSection());
 update(initial);
 
 // Copy button
+const copyBtnLabel = () => copyBtn.querySelector(".mainBar__cta-btn__label")!;
 copyBtn.addEventListener("click", async () => {
   const textarea = inputSection.querySelector("textarea") as HTMLTextAreaElement;
   const text = textarea?.value ?? "";
   try {
     await navigator.clipboard.writeText(text);
-    copyBtn.textContent = "Copied!";
-    setTimeout(() => { copyBtn.textContent = "Copy"; }, 1500);
+    copyBtnLabel().textContent = "Copied!";
+    setTimeout(() => { copyBtnLabel().textContent = "Copy"; }, 1500);
   } catch {
-    copyBtn.textContent = "Failed";
-    setTimeout(() => { copyBtn.textContent = "Copy"; }, 1500);
+    copyBtnLabel().textContent = "Failed";
+    setTimeout(() => { copyBtnLabel().textContent = "Copy"; }, 1500);
   }
 });

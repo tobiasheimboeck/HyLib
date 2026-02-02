@@ -25,11 +25,31 @@
 body {
   margin: 0;
   font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--bg-dark);
+  background-color: #10233f;
+  background-image: url("https://hytale.com/static/images/backgrounds/content-upper-new-1920.jpg");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--text);
   min-height: 100vh;
   line-height: 1.5;
   font-weight: 400;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(16, 35, 63, 0.4) 0%, rgba(16, 35, 63, 0.5) 50%, rgba(18, 24, 61, 0.6) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 #app {
@@ -220,27 +240,36 @@ textarea:focus {
   color: var(--link);
 }
 
-/* Primary button - Hytale Purchase button style */
-.copy-btn {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-family: inherit;
-  font-weight: 600;
-  background: linear-gradient(180deg, #4a97d9 0%, #3a75b4 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: white;
+/* mainBar CTA button - matches Hytale navbar Purchase button */
+.copy-btn.mainBar__cta-btn {
+  display: inline-block;
+  position: relative;
+  z-index: 0;
+  height: 2.5em;
+  padding: 0 1.2em;
+  margin: 4px 4px 0 4px;
+  border-radius: 5px;
+  border: 1px solid #a17f3c;
+  background: linear-gradient(to bottom, #3583b4, #225b8b);
+  box-sizing: border-box;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.3);
+  line-height: 2.5em;
   cursor: pointer;
-  margin-left: auto;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s;
 }
 
-.copy-btn:hover {
-  background: linear-gradient(180deg, #5aa8ea 0%, #4a97d9 100%);
-  box-shadow: 0 2px 8px rgba(74, 151, 217, 0.4);
+.copy-btn.mainBar__cta-btn:hover {
+  background: linear-gradient(to bottom, #378abd, #296799);
+}
+
+.copy-btn.mainBar__cta-btn .mainBar__cta-btn__label {
+  display: inline-block;
+  font-family: "Lexend", sans-serif;
+  font-weight: 700;
+  color: #d1dde4;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.08em;
 }
 
 .header-row {
