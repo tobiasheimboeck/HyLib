@@ -157,6 +157,10 @@ gradle.properties
 # Cache of project
 .gradletasknamecache
 
+# WebUI (Vite)
+webui/node_modules/
+webui/dist/
+
 # Eclipse Gradle plugin generated files
 # Eclipse Core
 .project

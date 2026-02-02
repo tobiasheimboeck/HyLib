@@ -1,0 +1,253 @@
+/* Hytale-style color palette and typography */
+
+:root {
+  /* Hytale dark theme - from hytale.com */
+  --bg-dark: #18181d;
+  --bg-panel: #1e2841;
+  --bg-input: #253457;
+  --bg-preview: #1e2841;
+  --border: #2d3a5a;
+  --border-light: #3d4d6e;
+  --text: #e8ecf4;
+  --text-muted: #8b9bb8;
+  --accent: #f4c94c;
+  --accent-hover: #ffd966;
+  --accent-blue: #4a97d9;
+  --accent-blue-hover: #5aa8ea;
+  --link: #8ccae7;
+  --link-hover: #b6e6fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+#app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+/* Input area */
+.input-section {
+  margin-bottom: 1.5rem;
+}
+
+.input-section label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 1rem;
+  font-family: "Source Sans 3", inherit;
+  font-size: 0.95rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(74, 151, 217, 0.2);
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.toolbar button,
+.toolbar select {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 500;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.toolbar button:hover,
+.toolbar select:hover {
+  background: var(--border);
+  border-color: var(--border-light);
+}
+
+.toolbar select {
+  cursor: pointer;
+  min-width: 110px;
+}
+
+/* Preview */
+.preview-section {
+  margin-bottom: 1.5rem;
+}
+
+.preview-section label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.preview-box {
+  min-height: 80px;
+  padding: 1rem;
+  background: var(--bg-preview);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: "Source Sans 3", inherit;
+}
+
+.preview-box a {
+  color: var(--link);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.preview-box a:hover {
+  color: var(--link-hover);
+}
+
+.preview-box .bold {
+  font-weight: 700;
+}
+
+.preview-box .italic {
+  font-style: italic;
+}
+
+.preview-box .underline {
+  text-decoration: underline;
+}
+
+.preview-box .mono {
+  font-family: "JetBrains Mono", "Fira Code", "SF Mono", Consolas, monospace;
+}
+
+/* Docs */
+.docs-section {
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.docs-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  transition: color 0.2s;
+}
+
+.docs-toggle:hover {
+  color: var(--accent-hover);
+}
+
+.docs-content {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.docs-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+}
+
+.docs-content th,
+.docs-content td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.docs-content code {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  background: var(--bg-input);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: var(--link);
+}
+
+/* Primary button - Hytale Purchase button style */
+.copy-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 600;
+  background: linear-gradient(180deg, #4a97d9 0%, #3a75b4 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  margin-left: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.copy-btn:hover {
+  background: linear-gradient(180deg, #5aa8ea 0%, #4a97d9 100%);
+  box-shadow: 0 2px 8px rgba(74, 151, 217, 0.4);
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
