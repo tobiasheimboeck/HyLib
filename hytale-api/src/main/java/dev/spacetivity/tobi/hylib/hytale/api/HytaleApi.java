@@ -1,120 +1,59 @@
 package dev.spacetivity.tobi.hylib.hytale.api;
 
 import dev.spacetivity.tobi.hylib.hytale.api.config.CodecBuilder;
-import dev.spacetivity.tobi.hylib.hytale.api.localization.Localization;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
+import dev.spacetivity.tobi.hylib.hytale.api.message.MessageParser;
+import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService;
 
 /**
- * Main API interface for Hytale-specific functionality.
- * 
- * <p>This interface provides access to Hytale-specific features including:
- * <ul>
- *   <li>Codec building for type-safe configuration</li>
- *   <li>Localization and translation functionality</li>
- * </ul>
- * 
- * <p>Instances of this interface should be obtained via {@link HytaleProvider#getApi()}
- * after registering an implementation using {@link HytaleProvider#register(HytaleApi)}.
- * 
- * <h3>Example Usage</h3>
- * 
- * <pre>{@code
- * // Initialize and register
- * HytaleApi api = new HytaleApiImpl();
- * HytaleProvider.register(api);
- * 
- * // Use the API
- * HytaleApi api = HytaleProvider.getApi();
- * CodecBuilder<MyConfig> builder = api.newCodec(MyConfig.class);
- * Localization loc = api.getLocalization();
- * }</pre>
- * 
+ * Main API for Hytale-specific functionality (codecs, localization, players, messages).
+ * Obtain via {@link HytaleProvider#getApi()} after {@link HytaleProvider#register(HytaleApi)}.
+ *
  * @see HytaleProvider
  * @see CodecBuilder
- * @see Localization
+ * @see LocalizationService
  * @since 1.0
  */
 public interface HytaleApi {
 
     /**
-     * Creates a new {@link CodecBuilder} for the specified configuration class.
-     * 
-     * <p>This method provides a fluent DSL for building codecs that can serialize
-     * and deserialize configuration objects using Hytale's {@code BuilderCodec} system.
-     * 
-     * <h3>Example</h3>
-     * 
-     * <pre>{@code
-     * CodecBuilder<MyConfig> builder = api.newCodec(MyConfig.class);
-     * 
-     * BuilderCodec<MyConfig> codec = builder
-     *     .field("hostname", Codec.STRING, MyConfig::setHostname, MyConfig::getHostname)
-     *         .withDefault("localhost")
-     *     .and()
-     *     .field("port", Codec.INTEGER, MyConfig::setPort, MyConfig::getPort)
-     *         .withDefault(3306)
-     *     .build();
-     * }</pre>
-     * 
-     * <h3>Requirements</h3>
-     * 
-     * <p>The configuration class must:
-     * <ul>
-     *   <li>Have a public no-argument constructor</li>
-     *   <li>Have getter and setter methods for all fields you want to serialize</li>
-     * </ul>
-     * 
-     * <p>It's recommended to use Lombok's {@code @Getter} and {@code @Setter} annotations
-     * to avoid boilerplate code.
-     * 
+     * Creates a new {@link CodecBuilder} for the given configuration class.
+     * Config class must have a no-arg constructor and getters/setters for fields.
+     *
      * @param <T>   the type of the configuration class
      * @param clazz the configuration class to build a codec for
-     * @return a new {@code CodecBuilder} instance for building the codec
+     * @return a new CodecBuilder instance
      * @throws NullPointerException if clazz is null
-     * @throws IllegalArgumentException if clazz doesn't have a no-argument constructor
+     * @throws IllegalArgumentException if clazz has no no-argument constructor
      * @see CodecBuilder
-     * @see CodecBuilder#field(String, com.hypixel.hytale.codec.Codec, java.util.function.BiConsumer, java.util.function.Function)
      */
     <T> CodecBuilder<T> newCodec(Class<T> clazz);
 
     /**
-     * Gets the localization API for translation functionality.
-     * 
-     * <p>This method returns the localization instance that provides translation
-     * capabilities with support for multiple languages, placeholders, and fallback handling.
-     * 
-     * <h3>Example</h3>
-     * 
-     * <pre>{@code
-     * HytaleApi api = HytaleProvider.getApi();
-     * Localization loc = api.getLocalization();
-     * String message = loc.translate("player.welcome", "en", player.getName());
-     * }</pre>
-     * 
-     * @return the localization API instance, never null
+     * Returns the localization service for translations (languages, placeholders, formatted Message).
+     *
+     * @return the localization service, never null
      * @throws IllegalStateException if localization has not been initialized
-     * @see Localization
+     * @see LocalizationService
      */
-    Localization getLocalization();
+    LocalizationService getLocalizationService();
 
     /**
-     * Gets the HyPlayer service for managing player data.
-     * 
-     * <p>This method returns the service that provides access to player information
-     * including language preferences.
-     * 
-     * <h3>Example</h3>
-     * 
-     * <pre>{@code
-     * HytaleApi api = HytaleProvider.getApi();
-     * HyPlayerService service = api.getHyPlayerService();
-     * HyPlayer player = service.getOnlineHyPlayer(uuid);
-     * String language = player.getLanguage();
-     * }</pre>
-     * 
-     * @return the HyPlayer service instance, never null
+     * Returns the HyPlayer service for player data and language preferences.
+     *
+     * @return the HyPlayer service, never null
      * @throws IllegalStateException if the service has not been initialized
-     * @see dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService
+     * @see HyPlayerService
      */
-    dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService getHyPlayerService();
+    HyPlayerService getHyPlayerService();
+
+    /**
+     * Returns the message parser for formatting strings into Hytale Message objects.
+     *
+     * @return the message parser, never null
+     * @throws IllegalStateException if the parser has not been initialized
+     * @see MessageParser
+     */
+    MessageParser getMessageParser();
 
 }

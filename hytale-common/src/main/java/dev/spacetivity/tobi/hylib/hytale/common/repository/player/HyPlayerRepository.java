@@ -5,6 +5,9 @@ import dev.spacetivity.tobi.hylib.database.api.connection.impl.sql.*;
 import dev.spacetivity.tobi.hylib.database.api.connection.impl.sql.builder.SqlBuilder;
 import dev.spacetivity.tobi.hylib.database.api.repository.Repository;
 import dev.spacetivity.tobi.hylib.database.api.repository.impl.AbstractMariaDbRepository;
+import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayer;
 import dev.spacetivity.tobi.hylib.hytale.common.api.player.HyPlayerImpl;
 
@@ -37,8 +40,16 @@ public class HyPlayerRepository extends AbstractMariaDbRepository<HyPlayer> impl
         try {
             UUID uniqueId = UuidUtils.bytesToUuid(resultSet.getBytes(PLAYER_ID_COL.name()));
             String username = resultSet.getString(PLAYER_NAME_COL.name());
-            String language = resultSet.getString(LANGUAGE_COL.name());
-            return new HyPlayerImpl(uniqueId, username, language);
+            String languageCode = resultSet.getString(LANGUAGE_COL.name());
+            // Convert string from DB to Lang object
+            Lang lang;
+            if (languageCode != null) {
+                lang = Lang.of(languageCode);
+            } else {
+                LocalizationService localizationService = HytaleProvider.getApi().getLocalizationService();
+                lang = localizationService.getDefaultLanguage();
+            }
+            return new HyPlayerImpl(uniqueId, username, lang);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -51,7 +62,7 @@ public class HyPlayerRepository extends AbstractMariaDbRepository<HyPlayer> impl
                 .insertInto(getTable())
                 .value(PLAYER_ID_COL, uuidBytes)
                 .value(PLAYER_NAME_COL, hyPlayer.getUsername())
-                .value(LANGUAGE_COL, hyPlayer.getLanguage())
+                .value(LANGUAGE_COL, hyPlayer.getLanguage().getCode()) // Store as string in DB
                 .build()
         );
     }
@@ -65,11 +76,11 @@ public class HyPlayerRepository extends AbstractMariaDbRepository<HyPlayer> impl
                 .build());
     }
 
-    public void changeLanguage(UUID uniqueId, String language) {
+    public void changeLanguage(UUID uniqueId, Lang lang) {
         byte[] uuidBytes = uuidToBytes(uniqueId);
         executeUpdate(SqlBuilder
                 .update(getTable())
-                .set(LANGUAGE_COL, language)
+                .set(LANGUAGE_COL, lang.getCode()) // Store as string in DB
                 .where(PLAYER_ID_COL, uuidBytes)
                 .build());
     }

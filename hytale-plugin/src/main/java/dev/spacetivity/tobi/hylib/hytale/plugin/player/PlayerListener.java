@@ -9,9 +9,11 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LanguageComponent;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayer;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService;
-import dev.spacetivity.tobi.hylib.hytale.plugin.localization.LocalComponent;
 
 import java.util.UUID;
 
@@ -46,8 +48,10 @@ public class PlayerListener {
 
     private static void handleNewPlayer(UUID uniqueId, String username, Ref<EntityStore> ref, Store<EntityStore> store) {
         hyPlayerService.createHyPlayer(uniqueId, username);
-        LocalComponent localComponent = new LocalComponent("en");
-        store.addComponent(ref, LocalComponent.getComponentType(), localComponent);
+        LocalizationService localizationService = HytaleProvider.getApi().getLocalizationService();
+        Lang defaultLang = localizationService.getDefaultLanguage();
+        LanguageComponent languageComponent = new LanguageComponent(defaultLang);
+        store.addComponent(ref, LanguageComponent.getComponentType(), languageComponent);
     }
 
     private static void handleExistingPlayer(UUID uniqueId, String username, HyPlayer hyPlayer, Ref<EntityStore> ref, Store<EntityStore> store) {
@@ -55,18 +59,18 @@ public class PlayerListener {
             hyPlayerService.changeUsername(uniqueId, username);
         }
         
-        synchronizeLocalComponent(hyPlayer.getLanguage(), ref, store);
+        synchronizeLanguageComponent(hyPlayer.getLanguage(), ref, store);
     }
 
-    private static void synchronizeLocalComponent(String language, Ref<EntityStore> ref, Store<EntityStore> store) {
-        LocalComponent localComponent = store.getComponent(ref, LocalComponent.getComponentType());
+    private static void synchronizeLanguageComponent(Lang lang, Ref<EntityStore> ref, Store<EntityStore> store) {
+        LanguageComponent languageComponent = store.getComponent(ref, LanguageComponent.getComponentType());
         
-        if (localComponent == null) {
-            localComponent = new LocalComponent(language);
-            store.addComponent(ref, LocalComponent.getComponentType(), localComponent);
-        } else if (!localComponent.getLanguage().equals(language)) {
-            localComponent.setLanguage(language);
-            store.replaceComponent(ref, LocalComponent.getComponentType(), localComponent);
+        if (languageComponent == null) {
+            languageComponent = new LanguageComponent(lang);
+            store.addComponent(ref, LanguageComponent.getComponentType(), languageComponent);
+        } else if (!languageComponent.getLanguage().equals(lang)) {
+            languageComponent.setLanguage(lang);
+            store.replaceComponent(ref, LanguageComponent.getComponentType(), languageComponent);
         }
     }
 

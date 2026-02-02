@@ -1,0 +1,6 @@
+{
+  "player.welcome": "Welcome {player}!",
+  "player.goodbye": "Goodbye {player}!",
+  "player.language_set": "Your language has been set to {language}",
+  "player.language_changed": "Your language has been changed to {language}"
+}

@@ -1,46 +1,11 @@
 package dev.spacetivity.tobi.hylib.database.api.cache;
 
 /**
- * Interface for in-memory cache implementations.
- * 
- * <p>A cache provides a simple key-value storage mechanism for frequently accessed data.
- * Caches are typically used to reduce database queries by storing recently accessed
- * data in memory.
- * 
- * <h3>Usage Example</h3>
- * 
- * <pre>{@code
- * Cache<String, User> userCache = new MyUserCache();
- * 
- * // Insert a value
- * userCache.insert("user-123", user);
- * 
- * // Get a value
- * User user = userCache.getValue("user-123");
- * 
- * // Update an existing value
- * boolean updated = userCache.update("user-123", updatedUser);
- * 
- * // Remove a value
- * userCache.remove("user-123");
- * }</pre>
- * 
- * <h3>Implementation Classes</h3>
- * 
- * <p>For convenience, you can extend one of the provided abstract implementations:
- * <ul>
- *   <li>{@link AbstractInMemoryCache} - Simple HashMap-based cache (not thread-safe)</li>
- *   <li>{@link AbstractThreadSafeInMemoryCache} - ConcurrentHashMap-based cache (thread-safe)</li>
- * </ul>
- * 
- * <h3>Thread Safety</h3>
- * 
- * <p>This interface does not specify thread safety requirements. Implementations should
- * document their thread safety guarantees. For thread-safe implementations, use
- * {@link AbstractThreadSafeInMemoryCache}.
- * 
- * @param <K> the type of keys maintained by this cache
- * @param <V> the type of mapped values
+ * In-memory key-value cache. Extend {@link AbstractInMemoryCache} or {@link AbstractThreadSafeInMemoryCache}.
+ * Thread safety is implementation-dependent.
+ *
+ * @param <K> the key type
+ * @param <V> the value type
  * @see AbstractInMemoryCache
  * @see AbstractThreadSafeInMemoryCache
  * @see CacheLoader

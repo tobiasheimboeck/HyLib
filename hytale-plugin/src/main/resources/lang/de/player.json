@@ -1,0 +1,6 @@
+{
+  "player.welcome": "Willkommen {player}!",
+  "player.goodbye": "Auf Wiedersehen {player}!",
+  "player.language_set": "Deine Sprache wurde auf {language} gesetzt",
+  "player.language_changed": "Deine Sprache wurde auf {language} geändert"
+}

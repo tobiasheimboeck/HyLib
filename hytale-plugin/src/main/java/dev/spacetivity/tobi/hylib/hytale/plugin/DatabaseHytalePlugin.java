@@ -13,7 +13,7 @@ import dev.spacetivity.tobi.hylib.database.common.DatabaseApiImpl;
 import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
 import dev.spacetivity.tobi.hylib.hytale.common.HytaleApiImpl;
 import dev.spacetivity.tobi.hylib.hytale.plugin.config.DbConfig;
-import dev.spacetivity.tobi.hylib.hytale.plugin.localization.LocalComponent;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LanguageComponent;
 import dev.spacetivity.tobi.hylib.hytale.plugin.localization.LocalizationSystem;
 import dev.spacetivity.tobi.hylib.hytale.plugin.player.PlayerListener;
 
@@ -22,7 +22,7 @@ public class DatabaseHytalePlugin extends JavaPlugin {
 
     private final DatabaseApiImpl dbApi;
     private final Config<DbConfig> dbConfig;
-    private ComponentType<EntityStore, LocalComponent> localComponentType;
+    private ComponentType<EntityStore, LanguageComponent> languageComponentType;
 
     public DatabaseHytalePlugin(JavaPluginInit init) {
         super(init);
@@ -48,12 +48,12 @@ public class DatabaseHytalePlugin extends JavaPlugin {
         // This will register repositories, caches, and initialize services
         HytaleProvider.register(new HytaleApiImpl(getClass().getClassLoader()));
 
-        // Register LocalComponent
-        this.localComponentType = this.getEntityStoreRegistry()
-                .registerComponent(LocalComponent.class, LocalComponent::new);
-        LocalComponent.setComponentType(this.localComponentType);
+        // Register LanguageComponent
+        this.languageComponentType = this.getEntityStoreRegistry()
+                .registerComponent(LanguageComponent.class, LanguageComponent::new);
+        LanguageComponent.setComponentType(this.languageComponentType);
 
-        // Register LocalizationSystem to synchronize LocalComponent with HyPlayer
+        // Register LocalizationSystem to synchronize LanguageComponent with HyPlayer
         this.getEntityStoreRegistry().registerSystem(new LocalizationSystem());
 
         // Register event listeners
@@ -62,12 +62,12 @@ public class DatabaseHytalePlugin extends JavaPlugin {
     }
 
     /**
-     * Gets the LocalComponent type for use in other parts of the plugin.
+     * Gets the LanguageComponent type for use in other parts of the plugin.
      * 
-     * @return the LocalComponent type
+     * @return the LanguageComponent type
      */
-    public ComponentType<EntityStore, LocalComponent> getLocalComponentType() {
-        return localComponentType;
+    public ComponentType<EntityStore, LanguageComponent> getLanguageComponentType() {
+        return languageComponentType;
     }
 
 }

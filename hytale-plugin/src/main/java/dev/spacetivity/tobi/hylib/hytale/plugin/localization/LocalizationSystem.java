@@ -9,6 +9,9 @@ import com.hypixel.hytale.component.system.RefChangeSystem;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LanguageComponent;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService;
 
 import javax.annotation.Nonnull;
@@ -16,48 +19,33 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
- * ECS System that synchronizes LocalComponent with HyPlayer.
- *
- * <p>This system automatically synchronizes language changes between the ECS Component
- * and the database-backed HyPlayer. When a LocalComponent is changed, it updates the
- * corresponding HyPlayer in the database.
- *
- * <h3>Example Usage</h3>
- *
- * <pre>{@code
- * // In plugin setup:
- * this.getEntityStoreRegistry().registerSystem(new LocalizationSystem());
- *
- * // In your ECS system, you can now directly access the language:
- * LocalComponent local = store.getComponent(ref, LocalComponent.getComponentType());
- * String language = local != null ? local.getLanguage() : "en";
- * }</pre>
+ * ECS system that synchronizes LanguageComponent with HyPlayer (database).
  *
  * @since 1.0
  */
-public class LocalizationSystem extends RefChangeSystem<EntityStore, LocalComponent> {
+public class LocalizationSystem extends RefChangeSystem<EntityStore, LanguageComponent> {
 
     private static final HyPlayerService hyPlayerService = HytaleProvider.getApi().getHyPlayerService();
 
     @Nonnull
     @Override
-    public ComponentType<EntityStore, LocalComponent> componentType() {
-        return LocalComponent.getComponentType();
+    public ComponentType<EntityStore, LanguageComponent> componentType() {
+        return LanguageComponent.getComponentType();
     }
 
     @Override
-    public void onComponentAdded(@Nonnull Ref<EntityStore> ref, @Nonnull LocalComponent localComponent,
+    public void onComponentAdded(@Nonnull Ref<EntityStore> ref, @Nonnull LanguageComponent languageComponent,
                                  @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         // Component was added - synchronize with HyPlayer
         UUID uniqueId = getUniqueId(ref, store);
         if (uniqueId != null) {
-            hyPlayerService.changeLanguage(uniqueId, localComponent.getLanguage());
+            hyPlayerService.changeLanguage(uniqueId, languageComponent.getLanguage());
         }
     }
 
     @Override
-    public void onComponentSet(@Nonnull Ref<EntityStore> ref, @Nullable LocalComponent oldComponent,
-                               @Nonnull LocalComponent newComponent, @Nonnull Store<EntityStore> store,
+    public void onComponentSet(@Nonnull Ref<EntityStore> ref, @Nullable LanguageComponent oldComponent,
+                               @Nonnull LanguageComponent newComponent, @Nonnull Store<EntityStore> store,
                                @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         // Component was updated - synchronize language change with HyPlayer
         UUID uniqueId = getUniqueId(ref, store);
@@ -67,19 +55,21 @@ public class LocalizationSystem extends RefChangeSystem<EntityStore, LocalCompon
     }
 
     @Override
-    public void onComponentRemoved(@Nonnull Ref<EntityStore> ref, @Nonnull LocalComponent localComponent,
+    public void onComponentRemoved(@Nonnull Ref<EntityStore> ref, @Nonnull LanguageComponent languageComponent,
                                    @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-        // Component was removed - reset to default language in HyPlayer
+        // Component was removed - reset to default lang in HyPlayer
         UUID uniqueId = getUniqueId(ref, store);
         if (uniqueId != null) {
-            hyPlayerService.changeLanguage(uniqueId, "en"); // Default language
+            LocalizationService localizationService = HytaleProvider.getApi().getLocalizationService();
+            Lang defaultLang = localizationService.getDefaultLanguage();
+            hyPlayerService.changeLanguage(uniqueId, defaultLang);
         }
     }
 
     @Nullable
     @Override
     public Query<EntityStore> getQuery() {
-        return LocalComponent.getComponentType();
+        return LanguageComponent.getComponentType();
     }
 
     private UUID getUniqueId(Ref<EntityStore> ref, Store<EntityStore> store) {

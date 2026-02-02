@@ -1,5 +1,11 @@
 package dev.spacetivity.tobi.hylib.hytale.api.player;
 
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -7,24 +13,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
- * Service for managing HyPlayer instances.
- * 
- * <p>This service provides methods to create, retrieve, update, and delete
- * player data. It handles both online (cached) and offline (database) players.
- * 
- * <h3>Example Usage</h3>
- * 
- * <pre>{@code
- * HyPlayerService service = HytaleProvider.getApi().getHyPlayerService();
- * 
- * // Get online player
- * HyPlayer player = service.getOnlineHyPlayer(uuid);
- * String language = player.getLanguage();
- * 
- * // Change language
- * service.changeLanguage(uuid, "de");
- * }</pre>
- * 
+ * Service for HyPlayer data (online/offline, create/update/delete, language).
+ *
  * @see HyPlayer
  * @since 1.0
  */
@@ -62,11 +52,20 @@ public interface HyPlayerService {
 
     /**
      * Gets an online player by their unique identifier.
-     * 
+     *
      * @param uniqueId the player's UUID
      * @return the online player, or null if not online
      */
     HyPlayer getOnlineHyPlayer(UUID uniqueId);
+
+    /**
+     * Gets the online HyPlayer for the given player ref, or null if not online.
+     *
+     * @param playerRef the player ref
+     * @return the online HyPlayer, or null if not online
+     * @throws NullPointerException if playerRef is null
+     */
+    HyPlayer getOnlineHyPlayer(PlayerRef playerRef);
 
     /**
      * Gets an online player by their username.
@@ -129,10 +128,22 @@ public interface HyPlayerService {
 
     /**
      * Changes the language preference of a player.
-     * 
+     *
      * @param uniqueId the player's UUID
-     * @param language the new language code (e.g., "en", "de")
+     * @param lang     the new lang
+     * @throws NullPointerException if lang is null
      */
-    void changeLanguage(UUID uniqueId, String language);
+    void changeLanguage(UUID uniqueId, Lang lang);
+
+    /**
+     * Changes the language for the player (DB/cache) and syncs {@link dev.spacetivity.tobi.hylib.hytale.api.localization.LanguageComponent} in the ECS store.
+     *
+     * @param uniqueId the player's UUID
+     * @param lang     the new lang
+     * @param ref      the player entity ref
+     * @param store    the entity store
+     * @throws NullPointerException if uniqueId, lang, ref or store is null
+     */
+    void setLanguageAndSync(UUID uniqueId, Lang lang, Ref<EntityStore> ref, Store<EntityStore> store);
 
 }

@@ -1,0 +1,4 @@
+{
+  "error.not_found": "Player {player} not found",
+  "error.invalid_language": "Invalid language code: {code}"
+}

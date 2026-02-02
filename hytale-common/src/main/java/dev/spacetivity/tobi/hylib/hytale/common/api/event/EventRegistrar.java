@@ -6,47 +6,9 @@ import dev.spacetivity.tobi.hylib.hytale.api.event.EventHandler;
 import java.lang.reflect.Method;
 
 /**
- * Utility class for automatically registering event handlers annotated with {@link EventHandler}.
- * 
- * <p>This class scans an object for methods annotated with {@code @EventHandler} and
- * automatically registers them with the Hytale event system. This eliminates the need
- * for manual event registration.
- * 
- * <h3>Example Usage</h3>
- * 
- * <pre>{@code
- * public class MyPlugin extends JavaPlugin {
- *     
- *     @Override
- *     protected void setup() {
- *         super.setup();
- *         
- *         // Register events from this class
- *         EventRegistrar.registerEvents(this, this);
- *         
- *         // Or from another listener class
- *         MyEventListener listener = new MyEventListener();
- *         EventRegistrar.registerEvents(this, listener);
- *     }
- * }
- * 
- * public class MyEventListener {
- *     
- *     @EventHandler
- *     public void onPlayerReady(PlayerReadyEvent event) {
- *         // Handle event
- *     }
- * }
- * }</pre>
- * 
- * <h3>Method Requirements</h3>
- * 
- * <p>Methods annotated with {@code @EventHandler} must:
- * <ul>
- *   <li>Have exactly one parameter (the event object)</li>
- *   <li>The parameter type must be a valid Hytale event class</li>
- * </ul>
- * 
+ * Registers all methods annotated with {@link EventHandler} from a listener object.
+ * Handler methods must have exactly one parameter (the event type).
+ *
  * @see EventHandler
  * @since 1.0
  */
@@ -57,24 +19,12 @@ public final class EventRegistrar {
     }
 
     /**
-     * Automatically registers all methods annotated with {@link EventHandler} from the
-     * given listener object.
-     * 
-     * <p>This method scans the listener object's class for all methods annotated with
-     * {@code @EventHandler} and registers them with the plugin's event registry.
-     * 
-     * <h3>Example</h3>
-     * 
-     * <pre>{@code
-     * MyEventListener listener = new MyEventListener();
-     * EventRegistrar.registerEvents(plugin, listener);
-     * }</pre>
-     * 
-     * @param plugin   the plugin instance to register events with
-     * @param listener the object containing event handler methods
-     * @throws IllegalArgumentException if a method annotated with {@code @EventHandler}
-     *                                  doesn't have exactly one parameter
-     * @throws NullPointerException     if plugin or listener is null
+     * Registers all {@link EventHandler} methods from the listener with the plugin.
+     *
+     * @param plugin   the plugin to register with
+     * @param listener the object with event handler methods
+     * @throws IllegalArgumentException if an @EventHandler method has not exactly one parameter
+     * @throws NullPointerException if plugin or listener is null
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void registerEvents(JavaPlugin plugin, Object listener) {

@@ -1,0 +1,5 @@
+{
+  "command.usage": "Usage: /{command} {args}",
+  "command.language.set": "Language set to {language}",
+  "command.language.available": "Available languages: {languages}"
+}

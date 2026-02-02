@@ -14,6 +14,7 @@ A Hytale utility library providing database functionality and Hytale-specific fe
 
 ### Hytale Module
 - **Config API** - Type-safe configuration with fluent DSL codec builder
+- **Localization API** - Multi-language translation system with plugin support
 
 ## Modules
 
@@ -922,6 +923,219 @@ DatabaseConfig config = dbConfig.get();
 if (config.getApiKey() == null || config.getApiKey().isEmpty()) {
     throw new IllegalStateException("API key is required!");
 }
+```
+
+---
+
+## Localization API
+
+The Localization API provides a multi-language translation system that supports multiple plugins. Each plugin can register its own language files, and translations are automatically merged.
+
+### Features
+
+- **Type-safe Keys** - Use `LangKey` instead of raw strings for compile-time safety
+- **Multi-language Support** - Load translations from multiple language files
+- **Plugin Support** - Each plugin can register its own language files
+- **Placeholder Support** - Use `{0}`, `{1}`, etc. for dynamic values
+- **Fallback Handling** - Falls back to default language if translation not found
+- **Dynamic Reloading** - Reload language files at runtime
+
+### Quick Start for Plugins
+
+#### 1. Create Language Files
+
+Create language files in your plugin's `src/main/resources/lang/` directory using the structure `lang/{language}/*.json`:
+
+**`lang/en/player.json`:**
+```json
+{
+  "myplugin.welcome": "Welcome {0}!",
+  "myplugin.goodbye": "Goodbye {0}!"
+}
+```
+
+**`lang/en/commands.json`:**
+```json
+{
+  "myplugin.command.help": "Help command",
+  "myplugin.command.info": "Info command"
+}
+```
+
+**`lang/de/player.json`:**
+```json
+{
+  "myplugin.welcome": "Willkommen {0}!",
+  "myplugin.goodbye": "Auf Wiedersehen {0}!"
+}
+```
+
+**`lang/de/commands.json`:**
+```json
+{
+  "myplugin.command.help": "Hilfe-Befehl",
+  "myplugin.command.info": "Info-Befehl"
+}
+```
+
+**Note:** Multiple JSON files per language are supported. All keys from all files are merged together.
+
+#### 2. Register Your Plugin's Language Source
+
+In your plugin's `setup()` method, register your ClassLoader:
+
+```java
+import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
+
+public class MyPlugin extends JavaPlugin {
+    
+    @Override
+    protected void setup() {
+        super.setup();
+        
+        // Register your plugin's language files
+        // Make sure HytaleApi is already initialized (usually by HyLib plugin)
+        HytaleProvider.getApi().getLocalization()
+            .registerLanguageSource(getClass().getClassLoader());
+    }
+}
+```
+
+#### 3. Create Type-safe Keys
+
+Create a key class in your plugin:
+
+```java
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LangKey;
+
+public final class MyPluginKeys {
+    private MyPluginKeys() {}
+    
+    public static final LangKey WELCOME = LangKey.of("myplugin.welcome");
+    public static final LangKey GOODBYE = LangKey.of("myplugin.goodbye");
+    public static final LangKey ERROR_NOT_FOUND = LangKey.of("myplugin.error.not_found");
+}
+```
+
+#### 4. Use Translations
+
+```java
+import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Locale;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Localization;
+
+public class MyCommand {
+    
+    public void execute(Player player) {
+        Localization loc = HytaleProvider.getApi().getLocalization();
+        
+        // Get player's locale (from LanguageComponent or HyPlayer)
+        Locale playerLocale = player.getLanguage(); // or get from HyPlayer/LanguageComponent
+        
+        // Translate with locale using type-safe keys
+        String welcomeMsg = loc.translate(MyPluginKeys.WELCOME, playerLocale, player.getName());
+        player.sendMessage(welcomeMsg);
+        
+        // Or use default locale
+        String goodbyeMsg = loc.translate(MyPluginKeys.GOODBYE, player.getName());
+        player.sendMessage(goodbyeMsg);
+    }
+}
+```
+
+### Type-safe Translation Keys
+
+Use `LangKey` for type-safe translation keys. This prevents typos and makes refactoring easier.
+
+#### Creating Keys
+
+```java
+// Simple key creation
+LangKey welcomeKey = LangKey.of("myplugin.welcome");
+
+// Recommended: Create a key class
+public final class MyPluginKeys {
+    private MyPluginKeys() {}
+    
+    public static final LangKey WELCOME = LangKey.of("myplugin.welcome");
+    public static final LangKey GOODBYE = LangKey.of("myplugin.goodbye");
+    public static final LangKey ERROR_NOT_FOUND = LangKey.of("myplugin.error.not_found");
+}
+```
+
+#### Translation Key Naming Convention
+
+To avoid conflicts between plugins, use a prefix for your translation keys:
+
+- ✅ **Good**: `myplugin.welcome`, `myplugin.command.help`
+- ❌ **Bad**: `welcome`, `command.help` (might conflict with other plugins)
+
+### Placeholder Usage
+
+Use placeholders `{0}`, `{1}`, etc. in your translation strings:
+
+```json
+{
+  "myplugin.welcome": "Welcome {0}!",
+  "myplugin.message": "Hello {0}, you have {1} items"
+}
+```
+
+```java
+// Using type-safe keys
+LangKey welcomeKey = LangKey.of("myplugin.welcome");
+LangKey messageKey = LangKey.of("myplugin.message");
+
+String msg1 = loc.translate(welcomeKey, lang, "PlayerName");
+// Result: "Welcome PlayerName!"
+
+String msg2 = loc.translate(messageKey, lang, "PlayerName", 5);
+// Result: "Hello PlayerName, you have 5 items"
+```
+
+### Getting Player Language
+
+To get a player's preferred language, you can use the `LanguageComponent` or `HyPlayer`:
+
+```java
+import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Locale;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Localization;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LanguageComponent;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+
+// From LanguageComponent (ECS)
+LanguageComponent languageComponent = store.getComponent(playerRef, LanguageComponent.getComponentType());
+Localization loc = HytaleProvider.getApi().getLocalization();
+Locale locale = languageComponent != null ? languageComponent.getLanguage() : loc.getDefaultLanguage();
+
+// Or from HyPlayer (database)
+HyPlayer hyPlayer = HytaleProvider.getApi().getHyPlayerService().getOnlineHyPlayer(uuid);
+Locale locale = hyPlayer != null ? hyPlayer.getLanguage() : loc.getDefaultLanguage();
+```
+
+### Reloading Language Files
+
+To reload all language files (useful during development):
+
+```java
+HytaleProvider.getApi().getLocalization().reload();
+```
+
+### Available Languages
+
+Check which languages are available (only languages with translation files):
+
+```java
+Set<Lang> langs = HytaleProvider.getApi().getLocalization().getAvailableLanguages();
+// Returns: Set of Lang objects for langs that have translation files
+
+// Create a Lang instance for a specific code
+HytaleApi api = HytaleProvider.getApi();
+Lang english = api.newLang("en");
+Lang german = api.newLang("de");
 ```
 
 ---
