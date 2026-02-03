@@ -9,8 +9,6 @@
 [![GitHub](https://img.shields.io/github/license/Spacetivity/HyLib)](LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/Spacetivity/HyLib)](https://github.com/Spacetivity/HyLib/releases)
 
-*Streamline your Hytale plugin development with type-safe database operations, configuration management, and localization support.*
-
 </div>
 
 ---
@@ -21,7 +19,7 @@ HyLib is a comprehensive utility library for Hytale server plugin development. I
 
 ## Features
 
-### 🗄️ **Database Module** (Hytale-Independent)
+### **Database Module** (Hytale-Independent)
 
 - **Type-Safe SQL Queries** - Fluent builder API with compile-time safety
 - **SQL Injection Protection** - Validated identifiers prevent common vulnerabilities
@@ -30,7 +28,7 @@ HyLib is a comprehensive utility library for Hytale server plugin development. I
 - **Connection Pooling** - Built on HikariCP for MariaDB
 - **In-Memory Caching** - Simple cache API for frequently accessed data
 
-### 🎮 **Hytale Module**
+### **Hytale Module**
 
 - **Type-Safe Configuration API** - Fluent DSL codec builder with method references
 - **Multi-Language Localization** - Translation system supporting multiple languages and plugins
@@ -88,12 +86,3 @@ This project is licensed under the terms specified in the LICENSE file.
 
 Developed by **Spacetivity** — Tobias Heimböck-Kramesberger (DeveloperTobi)
 
----
-
-<div align="center">
-
-**Not official Hytale software. Not approved by or associated with Hypixel Studios Canada Inc. or Hytale.**
-
-Made with ❤️ for the Hytale community
-
-</div>
