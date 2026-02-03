@@ -162,6 +162,9 @@ webui/node_modules/
 webui/dist/
 webui/.env
 
+# Wiki (local documentation, not committed - using GitBook)
+wiki/
+
 # Eclipse Gradle plugin generated files
 # Eclipse Core
 .project
