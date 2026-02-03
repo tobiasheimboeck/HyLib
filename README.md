@@ -4,8 +4,6 @@
 
 </div>
 
----
-
 ## Overview
 
 HyLib is a comprehensive utility library for Hytale server plugin development. It provides type-safe database operations, flexible configuration management, and a powerful localization system—eliminating boilerplate code and common pitfalls.
