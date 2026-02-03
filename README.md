@@ -2,13 +2,6 @@
 
 ![HyLib Banner](assets/hylib-banner.png)
 
-# HyLib
-
-**A powerful utility library for Hytale server development**
-
-[![GitHub](https://img.shields.io/github/license/Spacetivity/HyLib)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/Spacetivity/HyLib)](https://github.com/Spacetivity/HyLib/releases)
-
 </div>
 
 ---
