@@ -157,11 +157,6 @@ gradle.properties
 # Cache of project
 .gradletasknamecache
 
-# WebUI (Vite)
-webui/node_modules/
-webui/dist/
-webui/.env
-
 # Wiki (local documentation, not committed - using GitBook)
 wiki/
 
@@ -172,3 +167,6 @@ wiki/
 .classpath
 
 # End of https://www.toptal.com/developers/gitignore/api/java,gradle,intellij
+
+# Cursor
+.cursor/
