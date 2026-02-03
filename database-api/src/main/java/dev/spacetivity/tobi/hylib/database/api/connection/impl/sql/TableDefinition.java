@@ -113,7 +113,6 @@ public class TableDefinition {
         StringJoiner fieldsString = new StringJoiner(", ");
         values.forEach(sqlColumn -> fieldsString.add(sqlColumn.getColumn().toSql() + " " + sqlColumn.getValue()));
         
-        // Add foreign key constraints
         for (SQLColumn sqlColumn : values) {
             if (sqlColumn.getForeignKey() != null) {
                 ForeignKey fk = sqlColumn.getForeignKey();
@@ -126,7 +125,6 @@ public class TableDefinition {
                 "CREATE TABLE IF NOT EXISTS " + table.toSql() + " (" + fieldsString + ")")) {
             statement.execute();
             Logger.getGlobal().log(Level.INFO, "Table checked/created: " + table.name());
-            // Always check if migration is needed (for existing tables that may need AUTO_INCREMENT added)
             migrateAutoIncrementColumns();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -148,23 +146,17 @@ public class TableDefinition {
         try {
             DatabaseMetaData metaData = connection.getMetaData();
             String catalog = connection.getCatalog();
-            // Schema can be null for MariaDB/MySQL, which is fine - pass null
             String schema = connection.getSchema();
             
-            // Check each column definition for AUTO_INCREMENT requirement
             for (SQLColumn sqlColumn : values) {
                 String columnValue = sqlColumn.getValue();
-                // Check if this column definition includes AUTO_INCREMENT
                 if (columnValue.contains(SQLDataType.AUTO_INCREMENT.getQueryText())) {
                     Column column = sqlColumn.getColumn();
                     String columnName = column.name();
                     
-                    // Check if the column exists and if it has AUTO_INCREMENT
-                    // Use null for schema if it's null (common in MariaDB/MySQL)
                     try (ResultSet columns = metaData.getColumns(catalog, schema, table.name(), columnName)) {
                         if (columns.next()) {
                             String isAutoIncrement = columns.getString("IS_AUTOINCREMENT");
-                            // "NO" or null means it doesn't have AUTO_INCREMENT, we need to add it
                             if (isAutoIncrement == null || "NO".equalsIgnoreCase(isAutoIncrement)) {
                                 alterColumnToAutoIncrement(column, columnValue);
                             }
@@ -191,9 +183,6 @@ public class TableDefinition {
      */
     private void alterColumnToAutoIncrement(Column column, String fullColumnDefinition) {
         try {
-            // Extract the data type and constraints from the full definition
-            // Format: "INT NOT NULL AUTO_INCREMENT PRIMARY KEY"
-            // We need to construct: "ALTER TABLE table MODIFY COLUMN column INT NOT NULL AUTO_INCREMENT PRIMARY KEY"
             String alterSql = "ALTER TABLE " + table.toSql() + " MODIFY COLUMN " + column.toSql() + " " + fullColumnDefinition;
             
             try (PreparedStatement statement = connection.prepareStatement(alterSql)) {

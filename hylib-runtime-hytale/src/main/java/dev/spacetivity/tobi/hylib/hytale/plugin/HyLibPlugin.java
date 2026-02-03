@@ -17,14 +17,13 @@ import dev.spacetivity.tobi.hylib.hytale.api.localization.LanguageComponent;
 import dev.spacetivity.tobi.hylib.hytale.plugin.localization.LocalizationSystem;
 import dev.spacetivity.tobi.hylib.hytale.plugin.player.PlayerListener;
 
-
-public class DatabaseHytalePlugin extends JavaPlugin {
+public class HyLibPlugin extends JavaPlugin {
 
     private final DatabaseApiImpl dbApi;
     private final Config<DbConfig> dbConfig;
     private ComponentType<EntityStore, LanguageComponent> languageComponentType;
 
-    public DatabaseHytalePlugin(JavaPluginInit init) {
+    public HyLibPlugin(JavaPluginInit init) {
         super(init);
 
         this.dbApi = new DatabaseApiImpl();
@@ -44,19 +43,13 @@ public class DatabaseHytalePlugin extends JavaPlugin {
 
         this.dbApi.establishConnection(credentials);
 
-        // Initialize HytaleApiImpl after database connection is established
-        // This will register repositories, caches, and initialize services
         HytaleProvider.register(new HytaleApiImpl(getClass().getClassLoader()));
 
-        // Register LanguageComponent
-        this.languageComponentType = this.getEntityStoreRegistry()
-                .registerComponent(LanguageComponent.class, LanguageComponent::new);
+        this.languageComponentType = this.getEntityStoreRegistry().registerComponent(LanguageComponent.class, LanguageComponent::new);
         LanguageComponent.setComponentType(this.languageComponentType);
 
-        // Register LocalizationSystem to synchronize LanguageComponent with HyPlayer
         this.getEntityStoreRegistry().registerSystem(new LocalizationSystem());
 
-        // Register event listeners
         this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, PlayerListener::onPlayerReady);
         this.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, PlayerListener::onPlayerDisconnect);
     }

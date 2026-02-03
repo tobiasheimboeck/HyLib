@@ -77,7 +77,6 @@ import dev.spacetivity.tobi.hylib.database.api.connection.impl.sql.Table;
 public final class SqlBuilder {
 
     private SqlBuilder() {
-        // Utility class - prevent instantiation
     }
 
     /**

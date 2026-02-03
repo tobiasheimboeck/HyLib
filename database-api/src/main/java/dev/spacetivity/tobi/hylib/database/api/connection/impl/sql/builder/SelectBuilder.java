@@ -263,7 +263,6 @@ public class SelectBuilder {
         sql.append(String.join(", ", columns.stream().map(Column::toSql).toList()));
         sql.append(" FROM ").append(table.toSql());
 
-        // Add JOIN clauses
         for (Join join : joins) {
             sql.append(" ").append(join.type().getSqlKeyword());
             sql.append(" ").append(join.table().toSql());

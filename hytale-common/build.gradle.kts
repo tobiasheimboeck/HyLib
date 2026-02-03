@@ -8,7 +8,7 @@ dependencies {
     
     compileOnly(libs.mariadb.jdbc)
     compileOnly(libs.hytale.server)
-    compileOnly(libs.hikaricp) // Available transitively via database-common in hytale-plugin
+    compileOnly(libs.hikaricp) // Available transitively via database-common in hylib-runtime-hytale
     implementation(libs.gson)
     
     compileOnly(libs.lombok)

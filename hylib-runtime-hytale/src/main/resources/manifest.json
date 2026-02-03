@@ -3,7 +3,7 @@
     "Name": "HyLib",
     "Version": "1.0.0",
     "Description": "Hytale utility library",
-    "Main": "dev.spacetivity.tobi.hylib.hytale.plugin.DatabaseHytalePlugin",
+    "Main": "dev.spacetivity.tobi.hylib.hytale.plugin.HyLibPlugin",
     "Author": [
         {
             "Name": "TGamings",

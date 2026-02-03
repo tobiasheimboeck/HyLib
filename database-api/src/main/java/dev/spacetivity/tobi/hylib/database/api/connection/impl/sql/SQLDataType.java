@@ -52,8 +52,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum SQLDataType {
 
-    // Text Types
-    
     /**
      * Variable-length string type, up to 255 characters.
      * SQL: {@code VARCHAR(255)}
@@ -80,8 +78,6 @@ public enum SQLDataType {
      */
     UUID("BINARY(16)"),
 
-    // Numeric Types
-    
     /**
      * 32-bit integer type.
      * SQL: {@code INT}
@@ -130,8 +126,6 @@ public enum SQLDataType {
      */
     DOUBLE("DOUBLE"),
 
-    // Date and Time Types
-    
     /**
      * Date type (year, month, day).
      * SQL: {@code DATE}
@@ -150,16 +144,12 @@ public enum SQLDataType {
      */
     TIMESTAMP("TIMESTAMP"),
 
-    // Boolean Type
-    
     /**
      * Boolean type (stored as TINYINT: 0 = false, 1 = true).
      * SQL: {@code TINYINT}
      */
     BOOLEAN("TINYINT"),
 
-    // Constraints
-    
     /**
      * Primary key constraint.
      * SQL: {@code PRIMARY KEY}
