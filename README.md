@@ -47,15 +47,23 @@ HyLib follows a modular architecture:
 
 HyLib is distributed via GitHub Packages. Configure the Maven repository, set up authentication with a GitHub Personal Access Token, and add dependencies for the modules you need.
 
-For detailed installation instructions, see the [Installation Guide](docs/INSTALLATION.md).
+For detailed installation instructions, see the [Installation Guide](https://github.com/Spacetivity/HyLib/wiki/Installation) in our Wiki.
 
 ## Documentation
 
-- **[Database Guide](docs/DATABASE.md)**: Complete guide to using the database API
-- **[Configuration Guide](docs/CONFIG.md)**: Creating and managing configurations
-- **[Localization Guide](docs/LOCALIZATION.md)**: Multi-language support
-- **[Message Formatting](docs/MESSAGES.md)**: Formatting messages with tags
-- **[WebUI](webui/README.md)**: Web-based message preview tool
+📚 **Complete documentation is available in our [GitHub Wiki](https://github.com/Spacetivity/HyLib/wiki)**.
+
+### Quick Links
+
+- **[Installation](https://github.com/Spacetivity/HyLib/wiki/Installation)**: Setup and configuration guide
+- **[Database Guide](https://github.com/Spacetivity/HyLib/wiki/Database-Guide)**: Complete guide to using the database API
+- **[SQL Query Builder](https://github.com/Spacetivity/HyLib/wiki/SQL-Query-Builder)**: Type-safe SQL query building
+- **[Repository Pattern](https://github.com/Spacetivity/HyLib/wiki/Repository-Pattern)**: Repository implementation guide
+- **[Configuration Guide](https://github.com/Spacetivity/HyLib/wiki/Configuration-Guide)**: Creating and managing configurations
+- **[Localization Guide](https://github.com/Spacetivity/HyLib/wiki/Localization-Guide)**: Multi-language support
+- **[Message Formatting](https://github.com/Spacetivity/HyLib/wiki/Message-Formatting)**: Formatting messages with tags
+- **[Player Management](https://github.com/Spacetivity/HyLib/wiki/Player-Management)**: Player data and language preferences
+- **[Cache System](https://github.com/Spacetivity/HyLib/wiki/Cache-System)**: In-memory caching strategies
 
 ## Requirements
 
