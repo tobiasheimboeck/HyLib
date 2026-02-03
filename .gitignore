@@ -159,6 +159,7 @@ gradle.properties
 
 # Wiki (local documentation, not committed - using GitBook)
 wiki/
+HyLib.wiki/
 
 # Eclipse Gradle plugin generated files
 # Eclipse Core
