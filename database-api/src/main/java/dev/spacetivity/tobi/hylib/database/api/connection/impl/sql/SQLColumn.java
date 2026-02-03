@@ -62,9 +62,9 @@ import lombok.Getter;
 @Getter
 public class SQLColumn {
 
-    private Column column;
-    private String value;
-    private ForeignKey foreignKey;
+    private final Column column;
+    private final String value;
+    private final ForeignKey foreignKey;
 
     public SQLColumn(Column column, String value) {
         this.column = column;

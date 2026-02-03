@@ -14,10 +14,6 @@ import java.lang.reflect.Method;
  */
 public final class EventRegistrar {
 
-    private EventRegistrar() {
-        // Utility class
-    }
-
     /**
      * Registers all {@link EventHandler} methods from the listener with the plugin.
      *
@@ -26,7 +22,6 @@ public final class EventRegistrar {
      * @throws IllegalArgumentException if an @EventHandler method has not exactly one parameter
      * @throws NullPointerException if plugin or listener is null
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public static void registerEvents(JavaPlugin plugin, Object listener) {
         if (plugin == null) {
             throw new NullPointerException("plugin cannot be null");

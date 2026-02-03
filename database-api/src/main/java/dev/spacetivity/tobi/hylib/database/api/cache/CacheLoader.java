@@ -7,7 +7,7 @@ import dev.spacetivity.tobi.hylib.database.api.registry.RegistryLoader;
  *
  * @see Cache
  * @see RegistryLoader
- * @see DatabaseApi#getCacheLoader()
+ * @see dev.spacetivity.tobi.hylib.database.api.DatabaseApi#getCacheLoader()
  * @since 1.0
  */
 public interface CacheLoader extends RegistryLoader<Cache<?, ?>> {

@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
  * 
  * @param name the validated column name
  * @see Table
- * @see dev.spacetivity.tobi.database.api.connection.impl.sql.builder.SqlBuilder
+ * @see dev.spacetivity.tobi.hylib.database.api.connection.impl.sql.builder.SqlBuilder
  * @since 1.0
  */
 public record Column(String name) {

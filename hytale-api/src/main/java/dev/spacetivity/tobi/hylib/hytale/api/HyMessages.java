@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.LangKey;
-import dev.spacetivity.tobi.hylib.hytale.api.localization.LanguageComponent;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Placeholder;
 import dev.spacetivity.tobi.hylib.hytale.api.message.MessageParser;
@@ -44,11 +43,11 @@ public final class HyMessages {
     }
 
     /**
-     * Translates a key using the player ref's language (from
-     * {@link LanguageComponent}) and returns a formatted Message.
+     * Translates a key using the player ref's language (from online HyPlayer)
+     * and returns a formatted Message.
      *
      * @param key          the translation key
-     * @param playerRef    the player ref (has ref and store)
+     * @param playerRef    the player ref
      * @param placeholders named placeholders
      * @return formatted Message
      * @throws NullPointerException if key or playerRef is null
@@ -86,8 +85,8 @@ public final class HyMessages {
     }
 
     /**
-     * Translates a key using the player's language (from {@link LanguageComponent} via
-     * {@code player.getReference()}) and sends the formatted Message to the player.
+     * Translates a key using the player's language (from online HyPlayer)
+     * and sends the formatted Message to the player.
      *
      * @param player       the player entity
      * @param key          the translation key
@@ -100,8 +99,7 @@ public final class HyMessages {
         if (reference == null)
             throw new NullPointerException("Reference cannot be null");
 
-        Store<EntityStore> store = reference.getStore();
-        Lang language = getLanguage(reference, store);
+        Lang language = getLanguage(reference);
 
         Message message = translate(key, language, placeholders);
         
@@ -109,6 +107,17 @@ public final class HyMessages {
             throw new NullPointerException("Message cannot be null");
 
         player.sendMessage(message);
+    }
+
+    public static void sendTranslated(PlayerRef playerRef, LangKey key, Placeholder... placeholders) {
+        Lang language = getLanguage(playerRef);
+
+        Message message = translate(key, language, placeholders);
+
+        if (message == null)
+            throw new NullPointerException("Message cannot be null");
+
+        playerRef.sendMessage(message);
     }
 
     /**
@@ -182,27 +191,18 @@ public final class HyMessages {
     }
 
     /**
-     * Returns the language for the player entity (from {@link LanguageComponent}),
-     * or default if missing.
+     * Returns the language for the player entity ref (from online HyPlayer or default).
      *
      * @param ref   the player entity ref
-     * @param store the entity store
+     * @param store the entity store (unused, kept for API compatibility)
      * @return the player's language or default, never null
-     * @throws NullPointerException if ref or store is null
+     * @throws NullPointerException if ref is null
      */
     public static Lang getLanguage(Ref<EntityStore> ref, Store<EntityStore> store) {
         if (ref == null) {
             throw new NullPointerException("Ref cannot be null");
         }
-        if (store == null) {
-            throw new NullPointerException("Store cannot be null");
-        }
-        try {
-            LanguageComponent languageComponent = store.getComponent(ref, LanguageComponent.getComponentType());
-            return languageComponent != null ? languageComponent.getLanguage() : getDefaultLanguage();
-        } catch (IllegalStateException e) {
-            return getDefaultLanguage();
-        }
+        return getLanguage(ref);
     }
 
     /**

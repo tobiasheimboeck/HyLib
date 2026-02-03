@@ -17,7 +17,6 @@ public class CacheLoaderImpl implements CacheLoader {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Optional<Cache<?, ?>> get(Class<Cache<?, ?>> clazz) {
         Cache<?, ?> cache = this.registeredCaches.get(clazz);
         if (cache != null) {
@@ -33,7 +32,6 @@ public class CacheLoaderImpl implements CacheLoader {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Cache<?, ?> getNullable(Class<Cache<?, ?>> clazz) {
         Cache<?, ?> cache = this.registeredCaches.get(clazz);
         if (cache != null) {
@@ -49,11 +47,10 @@ public class CacheLoaderImpl implements CacheLoader {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T extends Cache<?, ?>> T getCache(Class<T> clazz) {
         // Suche nach exaktem Match
         Cache<?, ?> cache = this.registeredCaches.get(clazz);
-        if (cache != null && clazz.isInstance(cache)) {
+        if (clazz.isInstance(cache)) {
             return (T) cache;
         }
         // Fallback: Suche nach Subtypen

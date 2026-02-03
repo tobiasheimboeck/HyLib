@@ -2,5 +2,10 @@
   "player.welcome": "Willkommen {player}!",
   "player.goodbye": "Auf Wiedersehen {player}!",
   "player.language_set": "Deine Sprache wurde auf {language} gesetzt",
-  "player.language_changed": "Deine Sprache wurde auf {language} geändert"
+  "player.language_changed": "Deine Sprache wurde auf {language} geändert",
+
+  "player.not_exist": "<red>Spieler daten existieren nicht!",
+  "player.language.not_exist": "<red>Sprache '{language}' ist nicht verfügbar!",
+  "player.language.already_selected": "<red>Du hast diese Sprache bereits ausgewählt!",
+  "player.language.changed": "<gray>Deine Sprache wurde zu <gold>{language} <gray>geändert."
 }

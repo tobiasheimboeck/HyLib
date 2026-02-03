@@ -9,7 +9,7 @@ import dev.spacetivity.tobi.hylib.database.api.connection.credentials.DatabaseCr
  * @see DatabaseConnector
  * @see DatabaseType
  * @see DatabaseCredentials
- * @see DatabaseApi#getDatabaseConnectionHandler()
+ * @see dev.spacetivity.tobi.hylib.database.api.DatabaseApi#getDatabaseConnectionHandler()
  * @since 1.0
  */
 public interface DatabaseConnectionHandler {

@@ -1,8 +1,8 @@
 package dev.spacetivity.tobi.hylib.hytale.plugin.config;
 
 import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,27 +11,17 @@ import lombok.Setter;
 public class DbConfig {
 
     private String hostname = "localhost";
-    private Integer port = 5520;
+    private Integer port = 3306;
     private String username = "root";
     private String database = "game_db";
     private String password = "password";
 
-    public static BuilderCodec<DbConfig> CODEC = HytaleProvider.getApi().newCodec(DbConfig.class)
-            .field("Hostname", Codec.STRING, DbConfig::setHostname, DbConfig::getHostname)
-            .withDefault("localhost")
-            .and()
-            .field("Port", Codec.INTEGER, DbConfig::setPort, DbConfig::getPort)
-            .withDefault(5520)
-            .and()
-            .field("Username", Codec.STRING, DbConfig::setUsername, DbConfig::getUsername)
-            .withDefault("root")
-            .and()
-            .field("Database", Codec.STRING, DbConfig::setDatabase, DbConfig::getDatabase)
-            .withDefault("game_db")
-            .and()
-            .field("Password", Codec.STRING, DbConfig::setPassword, DbConfig::getPassword)
-            .withDefault("password")
-            .and()
+    public static BuilderCodec<DbConfig> CODEC = BuilderCodec.builder(DbConfig.class, DbConfig::new)
+            .append(new KeyedCodec<>("Hostname", Codec.STRING), (obj, val, info) -> obj.setHostname(val != null ? val : "localhost"), (obj, info) -> obj.getHostname()).add()
+            .append(new KeyedCodec<>("Port", Codec.INTEGER), (obj, val, info) -> obj.setPort(val != null ? val : 5520), (obj, info) -> obj.getPort()).add()
+            .append(new KeyedCodec<>("Username", Codec.STRING), (obj, val, info) -> obj.setUsername(val != null ? val : "root"), (obj, info) -> obj.getUsername()).add()
+            .append(new KeyedCodec<>("Database", Codec.STRING), (obj, val, info) -> obj.setDatabase(val != null ? val : "game_db"), (obj, info) -> obj.getDatabase()).add()
+            .append(new KeyedCodec<>("Password", Codec.STRING), (obj, val, info) -> obj.setPassword(val != null ? val : "password"), (obj, info) -> obj.getPassword()).add()
             .build();
 
 }

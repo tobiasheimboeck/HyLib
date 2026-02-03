@@ -1,15 +1,16 @@
 package dev.spacetivity.tobi.hylib.hytale.common.api.player;
 
+import com.hypixel.hytale.event.EventBus;
+import com.hypixel.hytale.event.IEventDispatcher;
+import com.hypixel.hytale.server.core.HytaleServer;
+import com.hypixel.hytale.server.core.universe.Universe;
 import dev.spacetivity.tobi.hylib.database.api.DatabaseProvider;
 import dev.spacetivity.tobi.hylib.database.api.cache.CacheLoader;
 import dev.spacetivity.tobi.hylib.database.api.connection.impl.sql.UuidUtils;
 import dev.spacetivity.tobi.hylib.database.api.repository.RepositoryLoader;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.spacetivity.tobi.hylib.hytale.api.event.events.LanguageChangeEvent;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
-import dev.spacetivity.tobi.hylib.hytale.api.localization.LanguageComponent;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayer;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService;
 import dev.spacetivity.tobi.hylib.hytale.common.repository.player.HyPlayerRepository;
@@ -133,39 +134,18 @@ public class HyPlayerServiceImpl implements HyPlayerService {
             if (hyPlayer == null) return;
 
             hyPlayer.setLanguage(lang);
+
+            EventBus eventBus = HytaleServer.get().getEventBus();
+            IEventDispatcher<LanguageChangeEvent, LanguageChangeEvent> dispatcher = eventBus.dispatchFor(LanguageChangeEvent.class);
+            if (dispatcher.hasListener()) {
+                PlayerRef playerRef = Universe.get().getPlayer(uniqueId);
+                if (playerRef == null) return;
+
+                LanguageChangeEvent event = new LanguageChangeEvent(playerRef, lang);
+                dispatcher.dispatch(event);
+            }
         });
     }
 
-    @Override
-    public void setLanguageAndSync(UUID uniqueId, Lang lang, Ref<EntityStore> ref, Store<EntityStore> store) {
-        if (uniqueId == null) {
-            throw new NullPointerException("uniqueId cannot be null");
-        }
-        if (lang == null) {
-            throw new NullPointerException("Lang cannot be null");
-        }
-        if (ref == null) {
-            throw new NullPointerException("Ref cannot be null");
-        }
-        if (store == null) {
-            throw new NullPointerException("Store cannot be null");
-        }
-        changeLanguage(uniqueId, lang);
-        syncLanguageComponent(ref, store, lang);
-    }
-
-    private void syncLanguageComponent(Ref<EntityStore> ref, Store<EntityStore> store, Lang lang) {
-        try {
-            LanguageComponent comp = store.getComponent(ref, LanguageComponent.getComponentType());
-            if (comp == null) {
-                store.addComponent(ref, LanguageComponent.getComponentType(), new LanguageComponent(lang));
-            } else if (!comp.getLanguage().equals(lang)) {
-                comp.setLanguage(lang);
-                store.replaceComponent(ref, LanguageComponent.getComponentType(), comp);
-            }
-        } catch (IllegalStateException ignored) {
-            // Component type not registered yet
-        }
-    }
 
 }

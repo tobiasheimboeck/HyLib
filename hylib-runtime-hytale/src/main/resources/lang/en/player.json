@@ -1,6 +1,11 @@
 {
-  "player.welcome": "Welcome {player}!",
+  "player.welcome": "<red>Welcome <gradient:red:green:blue>{player}!</gradient>",
   "player.goodbye": "Goodbye {player}!",
   "player.language_set": "Your language has been set to {language}",
-  "player.language_changed": "Your language has been changed to {language}"
+  "player.language_changed": "Your language has been changed to {language}",
+
+  "player.not_exist": "<red>Player data not found!",
+  "player.language.not_exist": "<red>Language '{language}' is not available!",
+  "player.language.already_selected": "<red>You already have this language selected!",
+  "player.language.changed": "<gray>Your language has been changed to <gold>{language}<gray>."
 }

@@ -38,7 +38,7 @@ import dev.spacetivity.tobi.hylib.database.api.connection.credentials.DatabaseCr
  * @param database the database name to connect to
  * @param password the database password
  * @see DatabaseCredentials
- * @see DatabaseConnector#establishConnection(DatabaseCredentials)
+ * @see dev.spacetivity.tobi.hylib.database.api.connection.DatabaseConnector#establishConnection(DatabaseCredentials)
  * @since 1.0
  */
 public record MariaDbCredentials(String hostname, int port, String username, String database, String password) implements DatabaseCredentials {

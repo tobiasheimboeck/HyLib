@@ -47,7 +47,7 @@ import java.sql.SQLException;
  * 
  * @param <T> the type of the domain object to map to
  * @see ResultSet
- * @see dev.spacetivity.tobi.database.api.repository.impl.AbstractMariaDbRepository
+ * @see dev.spacetivity.tobi.hylib.database.api.repository.impl.AbstractMariaDbRepository
  * @since 1.0
  */
 @FunctionalInterface

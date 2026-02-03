@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 public class LocalizationServiceImpl implements LocalizationService {
 
     /** Matches named placeholders like {player}, {input}, {count}. */
-    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\{([^}]+)\\}");
+    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\{([^}]+)}");
     
     private final List<JsonLanguageLoader> loaders;
     private final Map<String, Map<String, String>> translations;

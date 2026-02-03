@@ -23,7 +23,6 @@ public class RepositoryLoaderImpl implements RepositoryLoader {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Optional<Repository> get(Class<Repository> clazz) {
         Repository repo = this.repositories.get(clazz);
         if (repo != null) {
@@ -42,7 +41,6 @@ public class RepositoryLoaderImpl implements RepositoryLoader {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Repository getNullable(Class<Repository> clazz) {
         Repository repo = this.repositories.get(clazz);
         if (repo != null) {
@@ -58,7 +56,6 @@ public class RepositoryLoaderImpl implements RepositoryLoader {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T extends Repository> T getRepository(Class<T> clazz) {
         // Suche nach exaktem Match
         Repository repo = this.repositories.get(clazz);

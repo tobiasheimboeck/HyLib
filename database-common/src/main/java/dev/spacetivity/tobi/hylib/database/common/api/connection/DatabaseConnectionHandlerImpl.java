@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 
-@SuppressWarnings("unchecked")
 public class DatabaseConnectionHandlerImpl implements DatabaseConnectionHandler {
 
     private final List<DatabaseConnector<?, ?>> connectors;
@@ -23,7 +22,6 @@ public class DatabaseConnectionHandlerImpl implements DatabaseConnectionHandler 
         registerConnector(new MariaDbConnector(), mariaDbCredentials);
     }
 
-    @SuppressWarnings("unchecked")
     @SneakyThrows
     @Override
     public <T, C extends DatabaseCredentials> DatabaseConnector<T, C> getConnectorNullsafe(DatabaseType type) {

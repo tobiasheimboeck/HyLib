@@ -8,7 +8,6 @@ import java.lang.annotation.Target;
 /**
  * Marks a method as an event handler. Method must have exactly one parameter (the event type).
  *
- * @see dev.spacetivity.tobi.hylib.hytale.common.api.event.EventRegistrar
  * @since 1.0
  */
 @Target(ElementType.METHOD)

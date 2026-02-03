@@ -1,6 +1,5 @@
 package dev.spacetivity.tobi.hylib.hytale.common.api.localization;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -24,7 +23,6 @@ public class JsonLanguageLoader {
     private static final String LANG_FILE_EXTENSION = ".json";
     private static final String DEFAULT_LANGUAGE = "en";
 
-    private final Gson gson;
     private final ClassLoader classLoader;
 
     /**
@@ -34,7 +32,6 @@ public class JsonLanguageLoader {
      */
     public JsonLanguageLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
-        this.gson = new Gson();
     }
 
     /**

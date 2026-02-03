@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
  * @see Repository
  * @see TableDefinition
  * @see SqlBuilder
- * @see DatabaseApi#getExecutorService()
+ * @see dev.spacetivity.tobi.hylib.database.api.DatabaseApi#getExecutorService()
  * @since 1.0
  */
 public abstract class AbstractMariaDbRepository<T> implements Repository {

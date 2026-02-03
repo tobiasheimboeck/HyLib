@@ -40,12 +40,12 @@ import lombok.Getter;
  * <h3>UUID Storage</h3>
  * 
  * <p>UUIDs are stored as {@code BINARY(16)} (16 bytes) for efficient storage and indexing.
- * Use {@link dev.spacetivity.tobi.database.api.connection.impl.sql.UuidUtils} for
+ * Use {@link UuidUtils} for
  * converting between UUID and byte arrays.
  * 
  * @see SQLColumn
  * @see TableDefinition
- * @see dev.spacetivity.tobi.database.api.connection.impl.sql.UuidUtils
+ * @see UuidUtils
  * @since 1.0
  */
 @Getter
@@ -74,7 +74,7 @@ public enum SQLDataType {
      * UUID stored as binary data (16 bytes).
      * SQL: {@code BINARY(16)}
      * 
-     * @see dev.spacetivity.tobi.database.api.connection.impl.sql.UuidUtils
+     * @see UuidUtils
      */
     UUID("BINARY(16)"),
 

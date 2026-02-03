@@ -20,11 +20,11 @@ package dev.spacetivity.tobi.hylib.database.api.connection.credentials;
  * <h3>Implementations</h3>
  * 
  * <ul>
- *   <li>{@link dev.spacetivity.tobi.database.api.connection.credentials.impl.MariaDbCredentials} - Credentials for MariaDB connections</li>
+ *   <li>{@link dev.spacetivity.tobi.hylib.database.api.connection.credentials.impl.MariaDbCredentials} - Credentials for MariaDB connections</li>
  * </ul>
  * 
- * @see DatabaseConnector#establishConnection(DatabaseCredentials)
- * @see dev.spacetivity.tobi.database.api.connection.credentials.impl.MariaDbCredentials
+ * @see dev.spacetivity.tobi.hylib.database.api.connection.DatabaseConnector#establishConnection(DatabaseCredentials)
+ * @see dev.spacetivity.tobi.hylib.database.api.connection.credentials.impl.MariaDbCredentials
  * @since 1.0
  */
 public interface DatabaseCredentials {

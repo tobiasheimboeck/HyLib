@@ -1,9 +1,6 @@
 package dev.spacetivity.tobi.hylib.hytale.api.player;
 
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
 
 import java.util.List;
@@ -134,16 +131,5 @@ public interface HyPlayerService {
      * @throws NullPointerException if lang is null
      */
     void changeLanguage(UUID uniqueId, Lang lang);
-
-    /**
-     * Changes the language for the player (DB/cache) and syncs {@link dev.spacetivity.tobi.hylib.hytale.api.localization.LanguageComponent} in the ECS store.
-     *
-     * @param uniqueId the player's UUID
-     * @param lang     the new lang
-     * @param ref      the player entity ref
-     * @param store    the entity store
-     * @throws NullPointerException if uniqueId, lang, ref or store is null
-     */
-    void setLanguageAndSync(UUID uniqueId, Lang lang, Ref<EntityStore> ref, Store<EntityStore> store);
 
 }

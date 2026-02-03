@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @see Repository
  * @see RegistryLoader
- * @see DatabaseApi#getRepositoryLoader()
+ * @see dev.spacetivity.tobi.hylib.database.api.DatabaseApi#getRepositoryLoader()
  * @since 1.0
  */
 public interface RepositoryLoader extends RegistryLoader<Repository> {
