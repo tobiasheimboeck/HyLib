@@ -2,11 +2,11 @@
     "Group": "dev.spacetivity.tobi.hylib.hytale.plugin",
     "Name": "HyLib",
     "Version": "1.0.0",
-    "Description": "Hytale utility library",
+    "Description": "HyLib is a utility library for Hytale server plugin development",
     "Main": "dev.spacetivity.tobi.hylib.hytale.plugin.HyLibPlugin",
     "Author": [
         {
-            "Name": "TGamings",
+            "Name": "DeveloperTobi",
             "Email": "tobias.heimboeck@nexalit.at",
             "Url": "discord.spacetivity.dev"
         }
