@@ -6,11 +6,20 @@ import com.google.gson.JsonParser;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Loads language files from JSON resources ({@code lang/{language}/*.json}). Keys from all files per language are merged.
@@ -35,6 +44,15 @@ public class JsonLanguageLoader {
     }
 
     /**
+     * Returns the ClassLoader used by this loader.
+     *
+     * @return the ClassLoader
+     */
+    public ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    /**
      * Loads all language files from {@code lang/{language}/*.json}; keys per language are merged.
      *
      * @return map of language code to translation map
@@ -53,20 +71,6 @@ public class JsonLanguageLoader {
         return languages;
     }
 
-    /**
-     * Extracts the prefix value from translations for a given language.
-     * The prefix key is removed from the translations map.
-     *
-     * @param language the language code
-     * @param translations the translations map (will be modified to remove prefix key)
-     * @return the prefix value, or null if not defined
-     */
-    public String extractPrefix(String language, Map<String, String> translations) {
-        if (translations == null) {
-            return null;
-        }
-        return translations.remove("prefix");
-    }
 
     /**
      * Discovers language codes that have at least one translation file.
@@ -97,15 +101,10 @@ public class JsonLanguageLoader {
     private boolean hasLanguageFiles(String language) {
         String langDir = LANG_DIRECTORY + language + "/";
         
-        // Try to find any JSON file in the language directory
-        // We check for common file names
-        String[] commonFiles = {"player.json", "command.json", "error.json", "messages.json", "common.json"};
-        
-        for (String fileName : commonFiles) {
-            String resourcePath = langDir + fileName;
-            if (classLoader.getResource(resourcePath) != null) {
-                return true;
-            }
+        // Try to find any JSON file in the language directory by scanning for all JSON files
+        Set<String> jsonFiles = findJsonFilesInDirectory(langDir);
+        if (!jsonFiles.isEmpty()) {
+            return true;
         }
         
         // Fallback: try old format lang/{language}.json for backwards compatibility
@@ -123,11 +122,11 @@ public class JsonLanguageLoader {
         Map<String, String> translations = new HashMap<>();
         String langDir = LANG_DIRECTORY + language + "/";
         
-        // Try to load common JSON files in the language directory
-        String[] commonFiles = {"player.json", "command.json", "error.json", "messages.json", "common.json"};
+        // Find and load all JSON files in the language directory
+        Set<String> jsonFiles = findJsonFilesInDirectory(langDir);
         boolean foundAny = false;
         
-        for (String fileName : commonFiles) {
+        for (String fileName : jsonFiles) {
             String resourcePath = langDir + fileName;
             Map<String, String> fileTranslations = loadJsonFile(resourcePath);
             if (fileTranslations != null && !fileTranslations.isEmpty()) {
@@ -146,6 +145,85 @@ public class JsonLanguageLoader {
         }
         
         return foundAny ? translations : null;
+    }
+
+    /**
+     * Finds all JSON files in a given resource directory.
+     * Works with both file system and JAR resources.
+     *
+     * @param directoryPath the directory path (e.g. "lang/en/")
+     * @return set of JSON file names found in the directory
+     */
+    private Set<String> findJsonFilesInDirectory(String directoryPath) {
+        Set<String> jsonFiles = new HashSet<>();
+        
+        try {
+            // Try to get the directory as a resource
+            URL dirUrl = classLoader.getResource(directoryPath);
+            if (dirUrl == null) {
+                return jsonFiles;
+            }
+            
+            URI dirUri = dirUrl.toURI();
+            
+            // Handle JAR files
+            if (dirUri.getScheme().equals("jar")) {
+                // Extract the JAR file path from the URI
+                String jarPath = dirUri.getSchemeSpecificPart();
+                int separatorIndex = jarPath.indexOf("!");
+                if (separatorIndex > 0) {
+                    URI jarUri = URI.create("jar:" + jarPath.substring(0, separatorIndex));
+                    String pathInJar = jarPath.substring(separatorIndex + 1);
+                    
+                    // Try to get existing file system or create new one
+                    FileSystem fileSystem = null;
+                    boolean shouldClose = false;
+                    try {
+                        try {
+                            fileSystem = FileSystems.getFileSystem(jarUri);
+                        } catch (Exception e) {
+                            // FileSystem doesn't exist, create a new one
+                            fileSystem = FileSystems.newFileSystem(jarUri, Collections.emptyMap());
+                            shouldClose = true;
+                        }
+                        
+                        Path dirPath = fileSystem.getPath(pathInJar);
+                        if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
+                            try (Stream<Path> paths = Files.list(dirPath)) {
+                                paths.filter(Files::isRegularFile)
+                                     .filter(path -> path.toString().endsWith(LANG_FILE_EXTENSION))
+                                     .forEach(path -> {
+                                         String fileName = path.getFileName().toString();
+                                         jsonFiles.add(fileName);
+                                     });
+                            }
+                        }
+                    } finally {
+                        if (shouldClose && fileSystem != null) {
+                            fileSystem.close();
+                        }
+                    }
+                }
+            } else {
+                // Handle file system resources
+                Path dirPath = Paths.get(dirUri);
+                if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
+                    try (Stream<Path> paths = Files.list(dirPath)) {
+                        paths.filter(Files::isRegularFile)
+                             .filter(path -> path.toString().endsWith(LANG_FILE_EXTENSION))
+                             .forEach(path -> {
+                                 String fileName = path.getFileName().toString();
+                                 jsonFiles.add(fileName);
+                             });
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // If directory scanning fails, return empty set
+            // This handles cases where the directory structure isn't directly accessible
+        }
+        
+        return jsonFiles;
     }
 
     /**

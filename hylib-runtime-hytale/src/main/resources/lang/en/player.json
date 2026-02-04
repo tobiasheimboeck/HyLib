@@ -1,12 +1,7 @@
 {
-  "prefix": "<gold>[HyLib] <gray>",
-  "player.welcome": "{prefix}<red>Welcome <gradient:red:green:blue>{player}!</gradient>",
-  "player.goodbye": "{prefix}Goodbye {player}!",
-  "player.language_set": "Your language has been set to {language}",
-  "player.language_changed": "Your language has been changed to {language}",
-
-  "player.not_exist": "{prefix}<red>Player data not found!",
-  "player.language.not_exist": "{prefix}<red>Language '{language}' is not available!",
-  "player.language.already_selected": "{prefix}<red>You already have this language selected!",
-  "player.language.changed": "{prefix}<gray>Your language has been changed to <gold>{language}<gray>."
+  "prefix": "<blue>[<gold>HyLib<blue>]<gray>",
+  "player.not_exist": "{prefix} <red>Player data not found!",
+  "player.language.not_exist": "{prefix} <red>Language '{language}' is not available!",
+  "player.language.already_selected": "{prefix} <red>You already have this language selected!",
+  "player.language.changed": "{prefix} <gray>Your language has been changed to <gold>{language}<gray>."
 }

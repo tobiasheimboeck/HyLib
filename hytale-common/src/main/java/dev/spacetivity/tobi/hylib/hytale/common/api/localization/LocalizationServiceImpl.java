@@ -30,7 +30,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     
     private final List<JsonLanguageLoader> loaders;
     private final Map<String, Map<String, String>> translations;
-    private final Map<String, String> prefixes;
+    private final Map<ClassLoader, Map<String, Map<String, String>>> prefixesByLoader; // ClassLoader -> (language -> (prefixName -> prefixValue))
     private final Lang defaultLanguage;
     private final MessageParser messageParser;
 
@@ -44,7 +44,7 @@ public class LocalizationServiceImpl implements LocalizationService {
         this.messageParser = messageParser;
         this.loaders = new ArrayList<>();
         this.translations = new HashMap<>();
-        this.prefixes = new HashMap<>();
+        this.prefixesByLoader = new HashMap<>();
         
         // Register the initial class loader
         JsonLanguageLoader initialLoader = new JsonLanguageLoader(classLoader);
@@ -144,7 +144,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public void reload() {
         translations.clear();
-        prefixes.clear();
+        prefixesByLoader.clear();
         loadAllLanguages();
     }
 
@@ -207,7 +207,7 @@ public class LocalizationServiceImpl implements LocalizationService {
             
             String replacement;
             if ("prefix".equals(name)) {
-                // Handle special {prefix} placeholder
+                // Handle {prefix} placeholder - use prefix from the most recently registered ClassLoader
                 replacement = getPrefix(languageCode, isDefaultLanguage);
             } else {
                 // Handle regular placeholders
@@ -221,18 +221,44 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     /**
-     * Gets the prefix for a given language, with fallback to default language prefix.
+     * Gets the prefix for a given language from the most recently registered ClassLoader.
+     * Searches ClassLoaders in reverse order (newest first) to find the prefix.
      *
      * @param languageCode the language code
      * @param isDefaultLanguage whether this is the default language
      * @return the prefix string, or empty string if not defined
      */
     private String getPrefix(String languageCode, boolean isDefaultLanguage) {
-        String prefix = prefixes.get(languageCode);
-        if (prefix == null && !isDefaultLanguage) {
-            prefix = prefixes.get(defaultLanguage.getCode());
+        // Search ClassLoaders in reverse order (newest first)
+        // This ensures we get the prefix from the plugin that most recently registered its language source
+        for (int i = loaders.size() - 1; i >= 0; i--) {
+            JsonLanguageLoader loader = loaders.get(i);
+            ClassLoader classLoader = loader.getClassLoader();
+            Map<String, Map<String, String>> loaderPrefixes = prefixesByLoader.get(classLoader);
+            
+            if (loaderPrefixes != null) {
+                Map<String, String> langPrefixes = loaderPrefixes.get(languageCode);
+                if (langPrefixes != null) {
+                    String prefix = langPrefixes.get("prefix");
+                    if (prefix != null) {
+                        return prefix;
+                    }
+                }
+                
+                // Fallback to default language prefix for this ClassLoader
+                if (!isDefaultLanguage) {
+                    Map<String, String> defaultLangPrefixes = loaderPrefixes.get(defaultLanguage.getCode());
+                    if (defaultLangPrefixes != null) {
+                        String prefix = defaultLangPrefixes.get("prefix");
+                        if (prefix != null) {
+                            return prefix;
+                        }
+                    }
+                }
+            }
         }
-        return prefix != null ? prefix : "";
+        
+        return "";
     }
 
     /**
@@ -240,7 +266,7 @@ public class LocalizationServiceImpl implements LocalizationService {
      */
     private void loadAllLanguages() {
         translations.clear();
-        prefixes.clear();
+        prefixesByLoader.clear();
         for (JsonLanguageLoader loader : loaders) {
             Map<String, Map<String, String>> loadedLanguages = loader.loadAllLanguages();
             extractAndStorePrefixes(loader, loadedLanguages);
@@ -249,21 +275,31 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     /**
-     * Extracts and stores prefixes from loaded translations.
+     * Extracts and stores prefixes from loaded translations per ClassLoader.
+     * Only the "prefix" key is extracted (not other keys ending with "prefix").
      *
      * @param loader the language loader used to extract prefixes
      * @param loadedLanguages the loaded language translations
      */
     private void extractAndStorePrefixes(JsonLanguageLoader loader, Map<String, Map<String, String>> loadedLanguages) {
+        ClassLoader classLoader = loader.getClassLoader();
+        Map<String, Map<String, String>> loaderPrefixes = new HashMap<>();
+        
         for (Map.Entry<String, Map<String, String>> langEntry : loadedLanguages.entrySet()) {
             String language = langEntry.getKey();
             Map<String, String> langTranslations = langEntry.getValue();
             
-            // Extract prefix from translations (this removes it from the map)
-            String prefix = loader.extractPrefix(language, langTranslations);
+            // Extract only the "prefix" key (case-sensitive)
+            String prefix = langTranslations.remove("prefix");
+            
             if (prefix != null) {
-                prefixes.put(language, prefix);
+                Map<String, String> langPrefixes = loaderPrefixes.computeIfAbsent(language, k -> new HashMap<>());
+                langPrefixes.put("prefix", prefix);
             }
+        }
+        
+        if (!loaderPrefixes.isEmpty()) {
+            prefixesByLoader.put(classLoader, loaderPrefixes);
         }
     }
 

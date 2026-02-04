@@ -1,10 +1,5 @@
 {
-  "prefix": "<gold>[HyLib] <gray>",
-  "player.welcome": "{prefix}Willkommen {player}!",
-  "player.goodbye": "{prefix}Auf Wiedersehen {player}!",
-  "player.language_set": "Deine Sprache wurde auf {language} gesetzt",
-  "player.language_changed": "Deine Sprache wurde auf {language} geändert",
-
+  "prefix": "<blue>[<gold>HyLib<blue>]<gray>",
   "player.not_exist": "{prefix}<red>Spieler daten existieren nicht!",
   "player.language.not_exist": "{prefix}<red>Sprache '{language}' ist nicht verfügbar!",
   "player.language.already_selected": "{prefix}<red>Du hast diese Sprache bereits ausgewählt!",

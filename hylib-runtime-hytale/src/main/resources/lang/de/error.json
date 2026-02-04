@@ -1,4 +1,0 @@
-{
-  "error.not_found": "Spieler {player} nicht gefunden",
-  "error.invalid_language": "Ungültiger Sprachcode: {code}"
-}
