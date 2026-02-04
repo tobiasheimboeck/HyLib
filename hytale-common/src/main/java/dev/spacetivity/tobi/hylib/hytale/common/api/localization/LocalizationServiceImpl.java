@@ -30,6 +30,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     
     private final List<JsonLanguageLoader> loaders;
     private final Map<String, Map<String, String>> translations;
+    private final Map<String, String> prefixes;
     private final Lang defaultLanguage;
     private final MessageParser messageParser;
 
@@ -43,6 +44,7 @@ public class LocalizationServiceImpl implements LocalizationService {
         this.messageParser = messageParser;
         this.loaders = new ArrayList<>();
         this.translations = new HashMap<>();
+        this.prefixes = new HashMap<>();
         
         // Register the initial class loader
         JsonLanguageLoader initialLoader = new JsonLanguageLoader(classLoader);
@@ -122,7 +124,7 @@ public class LocalizationServiceImpl implements LocalizationService {
         if (translation == null) {
             translation = key.getKey();
         }
-        return replacePlaceholders(translation, placeholders);
+        return replacePlaceholders(translation, languageCode, lang.equals(defaultLanguage), placeholders);
     }
 
     @Override
@@ -142,6 +144,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public void reload() {
         translations.clear();
+        prefixes.clear();
         loadAllLanguages();
     }
 
@@ -156,6 +159,7 @@ public class LocalizationServiceImpl implements LocalizationService {
         
         // Load and merge translations from the new source
         Map<String, Map<String, String>> newTranslations = loader.loadAllLanguages();
+        extractAndStorePrefixes(loader, newTranslations);
         mergeTranslations(newTranslations);
     }
 
@@ -177,19 +181,22 @@ public class LocalizationServiceImpl implements LocalizationService {
     /**
      * Replaces named placeholders in a translation string (e.g. {@code {player}}, {@code {input}}).
      * Values are taken from the given placeholders and converted via {@link String#valueOf(Object)}.
+     * Also handles the special {@code {prefix}} placeholder using language-specific prefix.
+     *
+     * @param translation the translation string with placeholders
+     * @param languageCode the current language code
+     * @param isDefaultLanguage whether the current language is the default language
+     * @param placeholders the placeholders to replace
+     * @return the translation string with placeholders replaced
      */
-    private String replacePlaceholders(String translation, Placeholder... placeholders) {
-        if (placeholders == null || placeholders.length == 0) {
-            return translation;
-        }
+    private String replacePlaceholders(String translation, String languageCode, boolean isDefaultLanguage, Placeholder... placeholders) {
         Map<String, String> byName = new HashMap<>();
-        for (Placeholder p : placeholders) {
-            if (p != null) {
-                byName.put(p.name(), String.valueOf(p.value()));
+        if (placeholders != null) {
+            for (Placeholder p : placeholders) {
+                if (p != null) {
+                    byName.put(p.name(), String.valueOf(p.value()));
+                }
             }
-        }
-        if (byName.isEmpty()) {
-            return translation;
         }
 
         Matcher matcher = PLACEHOLDER_PATTERN.matcher(translation);
@@ -197,7 +204,16 @@ public class LocalizationServiceImpl implements LocalizationService {
         while (matcher.find()) {
             String fullMatch = matcher.group(0);   // e.g. "{player}"
             String name = matcher.group(1);         // e.g. "player"
-            String replacement = byName.getOrDefault(name, fullMatch);
+            
+            String replacement;
+            if ("prefix".equals(name)) {
+                // Handle special {prefix} placeholder
+                replacement = getPrefix(languageCode, isDefaultLanguage);
+            } else {
+                // Handle regular placeholders
+                replacement = byName.getOrDefault(name, fullMatch);
+            }
+            
             matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
         }
         matcher.appendTail(result);
@@ -205,13 +221,49 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     /**
+     * Gets the prefix for a given language, with fallback to default language prefix.
+     *
+     * @param languageCode the language code
+     * @param isDefaultLanguage whether this is the default language
+     * @return the prefix string, or empty string if not defined
+     */
+    private String getPrefix(String languageCode, boolean isDefaultLanguage) {
+        String prefix = prefixes.get(languageCode);
+        if (prefix == null && !isDefaultLanguage) {
+            prefix = prefixes.get(defaultLanguage.getCode());
+        }
+        return prefix != null ? prefix : "";
+    }
+
+    /**
      * Loads all available language files from all registered sources.
      */
     private void loadAllLanguages() {
         translations.clear();
+        prefixes.clear();
         for (JsonLanguageLoader loader : loaders) {
             Map<String, Map<String, String>> loadedLanguages = loader.loadAllLanguages();
+            extractAndStorePrefixes(loader, loadedLanguages);
             mergeTranslations(loadedLanguages);
+        }
+    }
+
+    /**
+     * Extracts and stores prefixes from loaded translations.
+     *
+     * @param loader the language loader used to extract prefixes
+     * @param loadedLanguages the loaded language translations
+     */
+    private void extractAndStorePrefixes(JsonLanguageLoader loader, Map<String, Map<String, String>> loadedLanguages) {
+        for (Map.Entry<String, Map<String, String>> langEntry : loadedLanguages.entrySet()) {
+            String language = langEntry.getKey();
+            Map<String, String> langTranslations = langEntry.getValue();
+            
+            // Extract prefix from translations (this removes it from the map)
+            String prefix = loader.extractPrefix(language, langTranslations);
+            if (prefix != null) {
+                prefixes.put(language, prefix);
+            }
         }
     }
 

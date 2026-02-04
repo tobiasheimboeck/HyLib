@@ -54,6 +54,21 @@ public class JsonLanguageLoader {
     }
 
     /**
+     * Extracts the prefix value from translations for a given language.
+     * The prefix key is removed from the translations map.
+     *
+     * @param language the language code
+     * @param translations the translations map (will be modified to remove prefix key)
+     * @return the prefix value, or null if not defined
+     */
+    public String extractPrefix(String language, Map<String, String> translations) {
+        if (translations == null) {
+            return null;
+        }
+        return translations.remove("prefix");
+    }
+
+    /**
      * Discovers language codes that have at least one translation file.
      *
      * @return set of available language codes
