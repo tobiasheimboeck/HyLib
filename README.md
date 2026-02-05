@@ -9,7 +9,7 @@ HyLib is a utility library for Hytale server plugin development. It provides typ
 ## Support
 
 - **Discord**: [discord.developertobi.net](https://discord.developertobi.net)
-- **GitHub Issues**: [Report bugs or request features](https://github.com/Spacetivity/HyLib/issues)
+- **GitHub Issues**: [Report bugs or request features](https://github.com/tobiasheimboeck/HyLib/issues)
 
 ## License
 

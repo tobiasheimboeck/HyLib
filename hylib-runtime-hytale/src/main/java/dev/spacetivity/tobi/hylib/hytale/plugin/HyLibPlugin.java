@@ -12,6 +12,7 @@ import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
 import dev.spacetivity.tobi.hylib.hytale.common.HytaleApiImpl;
 import dev.spacetivity.tobi.hylib.hytale.plugin.command.LanguageCommand;
+import dev.spacetivity.tobi.hylib.hytale.plugin.command.FormattingTestCommand;
 import dev.spacetivity.tobi.hylib.hytale.plugin.config.DbConfig;
 import dev.spacetivity.tobi.hylib.hytale.plugin.config.LanguageConfig;
 import dev.spacetivity.tobi.hylib.hytale.plugin.player.PlayerListener;
@@ -63,6 +64,9 @@ public class HyLibPlugin extends JavaPlugin {
         if (dbConfigValue.isEnabled() && languageConfigValue.isLanguageCommandEnabled()) {
             getCommandRegistry().registerCommand(new LanguageCommand());
         }
+        
+        // Register formatting test command for screenshots
+        getCommandRegistry().registerCommand(new FormattingTestCommand());
 
         getEventRegistry().registerGlobal(PlayerReadyEvent.class, PlayerListener::onPlayerReady);
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, PlayerListener::onPlayerDisconnect);
