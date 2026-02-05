@@ -41,8 +41,7 @@ public interface HytaleApi {
     /**
      * Returns the HyPlayer service for player data and language preferences.
      *
-     * @return the HyPlayer service, never null
-     * @throws IllegalStateException if the service has not been initialized
+     * @return the HyPlayer service, or null if database is not configured
      * @see HyPlayerService
      */
     HyPlayerService getHyPlayerService();

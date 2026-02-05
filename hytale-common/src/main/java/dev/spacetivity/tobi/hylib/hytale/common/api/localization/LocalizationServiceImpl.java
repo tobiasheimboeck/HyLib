@@ -39,8 +39,9 @@ public class LocalizationServiceImpl implements LocalizationService {
      *
      * @param classLoader   the class loader for language files
      * @param messageParser the message parser for translating to Message
+     * @param defaultLanguage optional default language, or null to auto-detect
      */
-    public LocalizationServiceImpl(ClassLoader classLoader, MessageParser messageParser) {
+    public LocalizationServiceImpl(ClassLoader classLoader, MessageParser messageParser, Lang defaultLanguage) {
         this.messageParser = messageParser;
         this.loaders = new ArrayList<>();
         this.translations = new HashMap<>();
@@ -52,9 +53,11 @@ public class LocalizationServiceImpl implements LocalizationService {
         this.loaders.add(initialLoader);
         loadAllLanguages();
         
-        // Determine default language: use "en" if available, otherwise first available language
+        // Determine default language: use provided, or auto-detect
         Lang defaultLang = null;
-        if (translations.containsKey("en")) {
+        if (defaultLanguage != null) {
+            defaultLang = defaultLanguage;
+        } else if (translations.containsKey("en")) {
             defaultLang = Lang.of("en");
         } else if (!translations.isEmpty()) {
             String firstLang = translations.keySet().iterator().next();

@@ -10,6 +10,7 @@ import dev.spacetivity.tobi.hylib.database.api.connection.credentials.DatabaseCr
 import dev.spacetivity.tobi.hylib.database.api.repository.RepositoryLoader;
 import dev.spacetivity.tobi.hylib.hytale.api.HytaleApi;
 import dev.spacetivity.tobi.hylib.hytale.api.config.CodecBuilder;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
 import dev.spacetivity.tobi.hylib.hytale.api.message.MessageParser;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService;
@@ -38,29 +39,47 @@ public class HytaleApiImpl implements HytaleApi {
     private final MessageParser messageParser;
 
     /**
-     * Creates HytaleApiImpl. Database API must be registered and connected.
+     * Creates HytaleApiImpl. Works with or without database connection.
+     * If database is not available, HyPlayerService will be null.
      *
      * @param classLoader the class loader for language files
-     * @throws IllegalStateException if Database API is not available or not connected
+     * @param defaultLanguage optional default language, or null to auto-detect
      */
     @SneakyThrows
-    public HytaleApiImpl(ClassLoader classLoader) {
+    public HytaleApiImpl(ClassLoader classLoader, Lang defaultLanguage) {
         this.messageParser = new MessageParserImpl();
-        this.localizationService = new LocalizationServiceImpl(classLoader, messageParser);
+        this.localizationService = new LocalizationServiceImpl(classLoader, messageParser, defaultLanguage);
 
-        DatabaseApi dbApi = DatabaseProvider.getApi();
-
+        // Check if database is available and connected
+        DatabaseApi dbApi = null;
+        try {
+            dbApi = DatabaseProvider.getApi();
+        } catch (IllegalStateException e) {
+            // Database API not registered
+            this.hyPlayerService = null;
+            return;
+        }
+        
         DatabaseConnectionHandler dbConnectionHandler = dbApi.getDatabaseConnectionHandler();
-        DatabaseConnector<HikariDataSource, DatabaseCredentials> connector = dbConnectionHandler.getConnectorNullsafe(DatabaseType.MARIADB);
-        Connection connection = connector.getSafeConnection().getConnection();
+        if (dbConnectionHandler != null) {
+            DatabaseConnector<HikariDataSource, DatabaseCredentials> connector = dbConnectionHandler.getConnectorNullsafe(DatabaseType.MARIADB);
+            if (connector != null) {
+                Connection connection = connector.getSafeConnection().getConnection();
+                if (connection != null) {
+                    RepositoryLoader repositoryLoader = dbApi.getRepositoryLoader();
+                    repositoryLoader.register(new HyPlayerRepository(dbConnectionHandler, connection));
 
-        RepositoryLoader repositoryLoader = dbApi.getRepositoryLoader();
-        repositoryLoader.register(new HyPlayerRepository(dbConnectionHandler, connection));
+                    CacheLoader cacheLoader = dbApi.getCacheLoader();
+                    cacheLoader.register(new HyPlayerCache());
 
-        CacheLoader cacheLoader = dbApi.getCacheLoader();
-        cacheLoader.register(new HyPlayerCache());
-
-        this.hyPlayerService = new HyPlayerServiceImpl(repositoryLoader, cacheLoader);
+                    this.hyPlayerService = new HyPlayerServiceImpl(repositoryLoader, cacheLoader);
+                    return;
+                }
+            }
+        }
+        
+        // Database not available or not connected
+        this.hyPlayerService = null;
     }
 
     @Override
@@ -75,7 +94,7 @@ public class HytaleApiImpl implements HytaleApi {
 
     @Override
     public HyPlayerService getHyPlayerService() {
-        return this.hyPlayerService;
+        return this.hyPlayerService; // May be null if database is not configured
     }
 
     @Override

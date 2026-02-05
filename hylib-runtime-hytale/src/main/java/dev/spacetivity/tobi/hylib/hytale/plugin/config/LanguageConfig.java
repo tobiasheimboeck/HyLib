@@ -8,12 +8,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GlobalConfig {
+public class LanguageConfig {
 
-    private boolean languageCommandEnabled;
+    private boolean languageCommandEnabled = false;
+    private String defaultLanguage = "en";
 
-    public static BuilderCodec<GlobalConfig> CODEC = BuilderCodec.builder(GlobalConfig.class, GlobalConfig::new)
+    public static BuilderCodec<LanguageConfig> CODEC = BuilderCodec.builder(LanguageConfig.class, LanguageConfig::new)
             .append(new KeyedCodec<>("LanguageCommandEnabled", Codec.BOOLEAN), (obj, val, info) -> obj.setLanguageCommandEnabled(val != null ? val : true), (obj, info) -> obj.isLanguageCommandEnabled()).add()
+            .append(new KeyedCodec<>("DefaultLanguage", Codec.STRING), (obj, val, info) -> obj.setDefaultLanguage(val != null ? val : "en"), (obj, info) -> obj.getDefaultLanguage()).add()
             .build();
 
 }

@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 public class DbConfig {
 
+    private boolean enabled = false;
     private String hostname = "localhost";
     private Integer port = 3306;
     private String username = "root";
@@ -17,6 +18,7 @@ public class DbConfig {
     private String password = "password";
 
     public static BuilderCodec<DbConfig> CODEC = BuilderCodec.builder(DbConfig.class, DbConfig::new)
+            .append(new KeyedCodec<>("Enabled", Codec.BOOLEAN), (obj, val, info) -> obj.setEnabled(val != null ? val : false), (obj, info) -> obj.isEnabled()).add()
             .append(new KeyedCodec<>("Hostname", Codec.STRING), (obj, val, info) -> obj.setHostname(val != null ? val : "localhost"), (obj, info) -> obj.getHostname()).add()
             .append(new KeyedCodec<>("Port", Codec.INTEGER), (obj, val, info) -> obj.setPort(val != null ? val : 5520), (obj, info) -> obj.getPort()).add()
             .append(new KeyedCodec<>("Username", Codec.STRING), (obj, val, info) -> obj.setUsername(val != null ? val : "root"), (obj, info) -> obj.getUsername()).add()

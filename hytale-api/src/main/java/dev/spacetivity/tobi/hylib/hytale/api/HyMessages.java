@@ -12,6 +12,7 @@ import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Placeholder;
 import dev.spacetivity.tobi.hylib.hytale.api.message.MessageParser;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayer;
+import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService;
 
 import java.util.Set;
 
@@ -148,6 +149,7 @@ public final class HyMessages {
 
     /**
      * Returns the language for the player ref (from online HyPlayer or default).
+     * If database is not configured, returns the default language.
      *
      * @param playerRef the player ref
      * @return the player's language or default, never null
@@ -177,17 +179,23 @@ public final class HyMessages {
     }
 
     /**
-     * Returns the online HyPlayer for the given player ref, or null if not online.
+     * Returns the online HyPlayer for the given player ref, or null if not online or database is not configured.
      *
      * @param playerRef the player ref
-     * @return the HyPlayer, or null if not online
+     * @return the HyPlayer, or null if not online or database is not available
      * @throws NullPointerException if playerRef is null
      */
     public static HyPlayer getHyPlayer(PlayerRef playerRef) {
         if (playerRef == null) {
             throw new NullPointerException("PlayerRef cannot be null");
         }
-        return HytaleProvider.getApi().getHyPlayerService().getOnlineHyPlayer(playerRef.getUuid());
+
+        HyPlayerService hyPlayerService = HytaleProvider.getApi().getHyPlayerService();
+        if (hyPlayerService == null) {
+            return null; // Database not configured
+        }
+        
+        return hyPlayerService.getOnlineHyPlayer(playerRef.getUuid());
     }
 
     /**
