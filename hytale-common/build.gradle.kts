@@ -6,6 +6,10 @@ dependencies {
     implementation(project(":hytale-api"))
     implementation(project(":database-api"))
     
+    // HyMessage Dependencies für MessageParser und PlaceholderReplacer
+    implementation(libs.hymessage.api)
+    implementation(libs.hymessage.common)
+    
     compileOnly(libs.mariadb.jdbc)
     compileOnly(libs.hytale.server)
     compileOnly(libs.hikaricp) // Available transitively via database-common in hylib-runtime-hytale

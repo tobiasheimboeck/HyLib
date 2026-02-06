@@ -2,11 +2,10 @@ package dev.spacetivity.tobi.hylib.hytale.api;
 
 import dev.spacetivity.tobi.hylib.hytale.api.config.CodecBuilder;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
-import dev.spacetivity.tobi.hylib.hytale.api.message.MessageParser;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService;
 
 /**
- * Main API for Hytale-specific functionality (codecs, localization, players, messages).
+ * Main API for Hytale-specific functionality (codecs, localization, players).
  * Obtain via {@link HytaleProvider#getApi()} after {@link HytaleProvider#register(HytaleApi)}.
  *
  * @see HytaleProvider
@@ -45,14 +44,5 @@ public interface HytaleApi {
      * @see HyPlayerService
      */
     HyPlayerService getHyPlayerService();
-
-    /**
-     * Returns the message parser for formatting strings into Hytale Message objects.
-     *
-     * @return the message parser, never null
-     * @throws IllegalStateException if the parser has not been initialized
-     * @see MessageParser
-     */
-    MessageParser getMessageParser();
 
 }

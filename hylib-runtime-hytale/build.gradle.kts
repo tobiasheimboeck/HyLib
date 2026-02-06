@@ -12,6 +12,10 @@ dependencies {
 
     implementation(project(":hytale-api"))
     implementation(project(":hytale-common"))
+    
+    // HyMessage Dependency - common wird in Plugin-JAR eingebunden
+    implementation(libs.hymessage.common)
+    
     compileOnly(libs.hytale.server)
     
     compileOnly(libs.lombok)

@@ -1,6 +1,7 @@
 package dev.spacetivity.tobi.hylib.hytale.api.localization;
 
 import com.hypixel.hytale.server.core.Message;
+import dev.spacetivity.tobi.hymessage.api.placeholder.Placeholder;
 
 import java.util.Set;
 

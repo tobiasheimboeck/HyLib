@@ -12,11 +12,12 @@ import dev.spacetivity.tobi.hylib.hytale.api.HytaleApi;
 import dev.spacetivity.tobi.hylib.hytale.api.config.CodecBuilder;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
-import dev.spacetivity.tobi.hylib.hytale.api.message.MessageParser;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService;
+import dev.spacetivity.tobi.hymessage.api.HyMessageProvider;
+import dev.spacetivity.tobi.hymessage.api.message.HyMessageBuilder;
+import dev.spacetivity.tobi.hymessage.api.message.MessageParser;
 import dev.spacetivity.tobi.hylib.hytale.common.api.config.CodecBuilderImpl;
 import dev.spacetivity.tobi.hylib.hytale.common.api.localization.LocalizationServiceImpl;
-import dev.spacetivity.tobi.hylib.hytale.common.api.message.MessageParserImpl;
 import dev.spacetivity.tobi.hylib.hytale.common.api.player.HyPlayerServiceImpl;
 import dev.spacetivity.tobi.hylib.hytale.common.repository.player.HyPlayerRepository;
 import dev.spacetivity.tobi.hylib.hytale.common.repository.player.cache.HyPlayerCache;
@@ -35,7 +36,7 @@ import com.zaxxer.hikari.HikariDataSource;
 public class HytaleApiImpl implements HytaleApi {
 
     private final LocalizationService localizationService;
-    private final HyPlayerService hyPlayerService;
+    private HyPlayerService hyPlayerService;
     private final MessageParser messageParser;
 
     /**
@@ -47,8 +48,35 @@ public class HytaleApiImpl implements HytaleApi {
      */
     @SneakyThrows
     public HytaleApiImpl(ClassLoader classLoader, Lang defaultLanguage) {
-        this.messageParser = new MessageParserImpl();
+        // Get MessageParser from HyMessage
+        this.messageParser = HyMessageProvider.getApi().getMessageParser();
         this.localizationService = new LocalizationServiceImpl(classLoader, messageParser, defaultLanguage);
+        initializeDatabase();
+    }
+    
+    /**
+     * Creates HytaleApiImpl with a custom message parser configuration.
+     * Works with or without database connection.
+     * If database is not available, HyPlayerService will be null.
+     *
+     * @param classLoader the class loader for language files
+     * @param defaultLanguage optional default language, or null to auto-detect
+     * @param builder the builder for configuring the message parser
+     * @throws NullPointerException if builder is null
+     */
+    @SneakyThrows
+    public HytaleApiImpl(ClassLoader classLoader, Lang defaultLanguage, HyMessageBuilder builder) {
+        if (builder == null) {
+            throw new NullPointerException("Builder cannot be null");
+        }
+        // Create MessageParser from builder
+        this.messageParser = HyMessageProvider.getApi().createMessageParser(builder);
+        this.localizationService = new LocalizationServiceImpl(classLoader, messageParser, defaultLanguage);
+        initializeDatabase();
+    }
+    
+    @SneakyThrows
+    private void initializeDatabase() {
 
         // Check if database is available and connected
         DatabaseApi dbApi = null;
@@ -95,11 +123,6 @@ public class HytaleApiImpl implements HytaleApi {
     @Override
     public HyPlayerService getHyPlayerService() {
         return this.hyPlayerService; // May be null if database is not configured
-    }
-
-    @Override
-    public MessageParser getMessageParser() {
-        return this.messageParser;
     }
 
 }

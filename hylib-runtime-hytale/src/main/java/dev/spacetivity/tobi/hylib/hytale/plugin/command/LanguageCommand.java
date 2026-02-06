@@ -9,12 +9,11 @@ import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayer
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.spacetivity.tobi.hylib.hytale.api.HyMessages;
 import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.LangKey;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
-import dev.spacetivity.tobi.hylib.hytale.api.localization.Placeholder;
+import dev.spacetivity.tobi.hymessage.api.placeholder.Placeholder;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayer;
 import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -39,7 +38,8 @@ public class LanguageCommand extends AbstractPlayerCommand {
         LocalizationService localizationService = HytaleProvider.getApi().getLocalizationService();
 
         if (!localizationService.isLanguageAvailable(newLang)) {
-            HyMessages.sendTranslated(playerRef, LangKey.of("player.language.not_exist"), Placeholder.of("language", newLanguageName));
+            Lang lang = getLanguage(playerRef, localizationService);
+            playerRef.sendMessage(localizationService.translate(LangKey.of("player.language.not_exist"), lang, Placeholder.of("language", newLanguageName)));
             return;
         }
 
@@ -47,19 +47,31 @@ public class LanguageCommand extends AbstractPlayerCommand {
         HyPlayer hyPlayer = playerService.getOnlineHyPlayer(playerRef);
 
         if (hyPlayer == null) {
-            HyMessages.sendTranslated(playerRef, LangKey.of("player.not_exist"));
+            Lang lang = getLanguage(playerRef, localizationService);
+            playerRef.sendMessage(localizationService.translate(LangKey.of("player.not_exist"), lang));
             return;
         }
 
         Lang currentLanguage = hyPlayer.getLanguage();
 
         if (currentLanguage.getCode().equalsIgnoreCase(newLanguageName)) {
-            HyMessages.sendTranslated(playerRef, LangKey.of("player.language.already_selected"));
+            playerRef.sendMessage(localizationService.translate(LangKey.of("player.language.already_selected"), currentLanguage));
             return;
         }
 
         playerService.changeLanguage(playerRef.getUuid(), newLang);
 
-        HyMessages.sendTranslated(playerRef, LangKey.of("player.language.changed"), Placeholder.of("language", newLang.getCode()));
+        playerRef.sendMessage(localizationService.translate(LangKey.of("player.language.changed"), newLang, Placeholder.of("language", newLang.getCode())));
+    }
+    
+    private Lang getLanguage(PlayerRef playerRef, LocalizationService localizationService) {
+        HyPlayerService playerService = HytaleProvider.getApi().getHyPlayerService();
+        if (playerService != null) {
+            HyPlayer hyPlayer = playerService.getOnlineHyPlayer(playerRef);
+            if (hyPlayer != null) {
+                return hyPlayer.getLanguage();
+            }
+        }
+        return localizationService.getDefaultLanguage();
     }
 }

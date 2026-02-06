@@ -4,8 +4,12 @@ import com.hypixel.hytale.server.core.Message;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.LangKey;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
-import dev.spacetivity.tobi.hylib.hytale.api.localization.Placeholder;
-import dev.spacetivity.tobi.hylib.hytale.api.message.MessageParser;
+import dev.spacetivity.tobi.hymessage.api.message.MessageParser;
+import dev.spacetivity.tobi.hymessage.api.placeholder.Placeholder;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import dev.spacetivity.tobi.hymessage.common.api.PlaceholderReplacer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,8 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Default implementation of {@link LocalizationService} (JSON language files, placeholders, fallback).
@@ -193,34 +195,24 @@ public class LocalizationServiceImpl implements LocalizationService {
      * @return the translation string with placeholders replaced
      */
     private String replacePlaceholders(String translation, String languageCode, boolean isDefaultLanguage, Placeholder... placeholders) {
-        Map<String, String> byName = new HashMap<>();
+        // First, handle special {prefix} placeholder
+        String prefix = getPrefix(languageCode, isDefaultLanguage);
+        
+        // Create extended placeholders including prefix
+        List<Placeholder> extendedPlaceholders = new ArrayList<>();
         if (placeholders != null) {
             for (Placeholder p : placeholders) {
                 if (p != null) {
-                    byName.put(p.name(), String.valueOf(p.value()));
+                    extendedPlaceholders.add(p);
                 }
             }
         }
-
-        Matcher matcher = PLACEHOLDER_PATTERN.matcher(translation);
-        StringBuffer result = new StringBuffer();
-        while (matcher.find()) {
-            String fullMatch = matcher.group(0);   // e.g. "{player}"
-            String name = matcher.group(1);         // e.g. "player"
-            
-            String replacement;
-            if ("prefix".equals(name)) {
-                // Handle {prefix} placeholder - use prefix from the most recently registered ClassLoader
-                replacement = getPrefix(languageCode, isDefaultLanguage);
-            } else {
-                // Handle regular placeholders
-                replacement = byName.getOrDefault(name, fullMatch);
-            }
-            
-            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
-        }
-        matcher.appendTail(result);
-        return result.toString();
+        // Add prefix placeholder
+        extendedPlaceholders.add(Placeholder.of("prefix", prefix));
+        
+        // Use HyMessage's MessageParser for placeholder replacement
+        // We need to replace placeholders manually since we're working with raw strings
+        return replacePlaceholdersInternal(translation, extendedPlaceholders.toArray(new Placeholder[0]));
     }
 
     /**
@@ -322,6 +314,37 @@ public class LocalizationServiceImpl implements LocalizationService {
             translations.computeIfAbsent(language, k -> new HashMap<>())
                     .putAll(langTranslations);
         }
+    }
+
+    /**
+     * Internal method to replace placeholders in a translation string.
+     * Similar to HyMessage's PlaceholderReplacer but handles special {prefix} placeholder.
+     *
+     * @param translation the translation string with placeholders
+     * @param placeholders the placeholders to replace
+     * @return the translation string with placeholders replaced
+     */
+    private String replacePlaceholdersInternal(String translation, Placeholder... placeholders) {
+        Map<String, String> byName = new HashMap<>();
+        if (placeholders != null) {
+            for (Placeholder p : placeholders) {
+                if (p != null) {
+                    byName.put(p.name(), String.valueOf(p.value()));
+                }
+            }
+        }
+
+        Matcher matcher = PLACEHOLDER_PATTERN.matcher(translation);
+        StringBuffer result = new StringBuffer();
+        while (matcher.find()) {
+            String fullMatch = matcher.group(0);   // e.g. "{player}"
+            String name = matcher.group(1);         // e.g. "player"
+            
+            String replacement = byName.getOrDefault(name, fullMatch);
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(result);
+        return result.toString();
     }
 
 }

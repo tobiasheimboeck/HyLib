@@ -7,7 +7,7 @@ import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayer
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.spacetivity.tobi.hylib.hytale.api.HyMessages;
+import dev.spacetivity.tobi.hymessage.api.HyMessages;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 /**

@@ -29,6 +29,15 @@ allprojects {
                 password = findProperty("github.token") as String? ?: System.getenv("GITHUB_TOKEN")
             }
         }
+        // HyMessage Repository
+        maven {
+            name = "HyMessagePackages"
+            url = uri("https://maven.pkg.github.com/${findProperty("github.owner")}/HyMessage")
+            credentials {
+                username = findProperty("github.username") as String? ?: System.getenv("GITHUB_ACTOR")
+                password = findProperty("github.token") as String? ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 

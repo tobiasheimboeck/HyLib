@@ -11,6 +11,7 @@ import dev.spacetivity.tobi.hylib.database.common.DatabaseApiImpl;
 import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
 import dev.spacetivity.tobi.hylib.hytale.common.HytaleApiImpl;
+import dev.spacetivity.tobi.hymessage.api.HyMessageProvider;
 import dev.spacetivity.tobi.hylib.hytale.plugin.command.LanguageCommand;
 import dev.spacetivity.tobi.hylib.hytale.plugin.command.FormattingTestCommand;
 import dev.spacetivity.tobi.hylib.hytale.plugin.config.DbConfig;
@@ -57,6 +58,9 @@ public class HyLibPlugin extends JavaPlugin {
             this.dbApi.establishConnection(credentials);
         }
 
+        // Initialize HyMessage first (required by HytaleApiImpl)
+        HyMessageProvider.register(new dev.spacetivity.tobi.hymessage.common.HyMessageApiImpl());
+        
         // Always initialize HytaleApi (works without database)
         Lang defaultLanguage = Lang.of(languageConfigValue.getDefaultLanguage());
         HytaleProvider.register(new HytaleApiImpl(getClassLoader(), defaultLanguage));

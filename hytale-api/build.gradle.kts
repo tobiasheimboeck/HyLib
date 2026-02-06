@@ -6,6 +6,9 @@ dependencies {
     compileOnly(libs.hytale.server)
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
+    
+    // HyMessage Dependency für Message Parsing
+    implementation(libs.hymessage.api)
 }
 
 tasks.named<Jar>("jar") {

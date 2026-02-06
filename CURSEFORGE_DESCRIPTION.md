@@ -1,5 +1,3 @@
-# HyLib
-
 ![HyLib Banner](https://raw.githubusercontent.com/tobiasheimboeck/HyLib/main/assets/hylib-banner.png)
 
 **HyLib** is a powerful utility library for Hytale server plugin development. It provides type-safe database operations, comprehensive configuration management, and a robust localization system that works with or without a database.
@@ -110,6 +108,13 @@ Install the `hylib-runtime-hytale` plugin on your server to enable:
 ### Example 1: Localization (No Database Required)
 
 ```java
+import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LocalizationService;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.LangKey;
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
+import dev.spacetivity.tobi.hylib.hytale.api.player.HyPlayerService;
+import dev.spacetivity.tobi.hymessage.api.placeholder.Placeholder;
+
 // Define translation keys
 public class Messages {
     public static final LangKey WELCOME = LangKey.of("welcome");
@@ -117,9 +122,18 @@ public class Messages {
 }
 
 // Send translated message to player
-HyMessages.sendTranslated(player, Messages.PLAYER_JOINED, 
+LocalizationService localizationService = HytaleProvider.getApi().getLocalizationService();
+HyPlayerService playerService = HytaleProvider.getApi().getHyPlayerService();
+
+// Get player's language (or default)
+Lang playerLang = playerService != null 
+    ? playerService.getOnlineHyPlayer(playerRef).getLanguage()
+    : localizationService.getDefaultLanguage();
+
+Message message = localizationService.translate(Messages.PLAYER_JOINED, playerLang, 
     Placeholder.of("player", player.getName())
 );
+playerRef.sendMessage(message);
 ```
 
 **Language file** (`lang/en/player.json`):
@@ -132,14 +146,18 @@ HyMessages.sendTranslated(player, Messages.PLAYER_JOINED,
 
 ### Message Formatting
 
-HyLib supports rich text formatting with colors, gradients, and styling:
+HyLib integrates with **HyMessage** for rich text formatting with colors, gradients, and styling:
 
 ```java
-// Parse formatted strings
+import dev.spacetivity.tobi.hymessage.api.HyMessages;
+
+// Parse formatted strings (using HyMessage API)
 Message msg1 = HyMessages.parse("<gradient:red:blue>Welcome to HyLib!</gradient>");
 Message msg2 = HyMessages.parse("<green>Success!</green> <yellow>Player joined</yellow>");
 Message msg3 = HyMessages.parse("<blue>[<gold>HyLib<blue>]<gray> Your language has been changed!");
 ```
+
+**Note:** HyMessage is automatically included as a dependency. The message parsing functionality is provided by the HyMessage library.
 
 ![Message Formatting Example](https://raw.githubusercontent.com/tobiasheimboeck/HyLib/main/assets/hymessage_feature.png)
 
@@ -148,6 +166,8 @@ Message msg3 = HyMessages.parse("<blue>[<gold>HyLib<blue>]<gray> Your language h
 ### Example 2: Player Service (Database Required)
 
 ```java
+import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
+
 HyPlayerService playerService = HytaleProvider.getApi().getHyPlayerService();
 if (playerService != null) {
     playerService.createHyPlayer(player.getUuid(), player.getName());
@@ -175,17 +195,25 @@ DefaultLanguage: "en"
 
 ## API Overview
 
-### HyMessages (Static Facade)
+### LocalizationService
 - `translate()` - Translate keys to messages
-- `sendTranslated()` - Send translated messages to players
-- `parse()` - Parse formatted strings to messages
-- `getLanguage()` - Get player's language preference
+- `getRawTranslation()` - Get translated string without parsing
+- `getDefaultLanguage()` - Get default language
+- `getAvailableLanguages()` - Get all available languages
 
 ### HytaleApi
 - `getLocalizationService()` - Access localization features
 - `getHyPlayerService()` - Access player management (null if DB disabled)
-- `getMessageParser()` - Parse message formatting
 - `newCodec()` - Create type-safe config codecs
+
+### HyMessage API (External Library)
+HyLib integrates with **HyMessage** for message parsing. The HyMessage library is automatically included as a dependency:
+- `HyMessages.parse()` - Parse formatted strings to messages
+- `HyMessages.strip()` - Remove formatting tags  
+- `HyMessages.builder()` - Create custom message parsers
+- `Placeholder.of()` - Create placeholders for dynamic content
+
+**Import:** `dev.spacetivity.tobi.hymessage.api.HyMessages` and `dev.spacetivity.tobi.hymessage.api.placeholder.Placeholder`
 
 ## Requirements
 
