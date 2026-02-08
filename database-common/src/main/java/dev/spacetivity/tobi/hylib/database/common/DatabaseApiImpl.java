@@ -1,14 +1,16 @@
 package dev.spacetivity.tobi.hylib.database.common;
 
-import lombok.Getter;
 import dev.spacetivity.tobi.hylib.database.api.DatabaseApi;
 import dev.spacetivity.tobi.hylib.database.api.cache.CacheLoader;
 import dev.spacetivity.tobi.hylib.database.api.connection.DatabaseConnectionHandler;
 import dev.spacetivity.tobi.hylib.database.api.connection.credentials.impl.MariaDbCredentials;
 import dev.spacetivity.tobi.hylib.database.api.repository.RepositoryLoader;
+import dev.spacetivity.tobi.hylib.database.api.scheduler.TaskScheduler;
 import dev.spacetivity.tobi.hylib.database.common.api.cache.CacheLoaderImpl;
 import dev.spacetivity.tobi.hylib.database.common.api.connection.DatabaseConnectionHandlerImpl;
 import dev.spacetivity.tobi.hylib.database.common.api.repository.RepositoryLoaderImpl;
+import dev.spacetivity.tobi.hylib.database.common.api.scheduler.DefaultTaskScheduler;
+import lombok.Getter;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,6 +24,7 @@ public class DatabaseApiImpl implements DatabaseApi {
     private DatabaseConnectionHandler databaseConnectionHandler;
     private CacheLoader cacheLoader;
     private RepositoryLoader repositoryLoader;
+    private TaskScheduler scheduler;
 
     public DatabaseApiImpl() {
         this.executorService = Executors.newVirtualThreadPerTaskExecutor();
@@ -31,6 +34,7 @@ public class DatabaseApiImpl implements DatabaseApi {
         this.databaseConnectionHandler = new DatabaseConnectionHandlerImpl(mariaDbCredentials);
         this.cacheLoader = new CacheLoaderImpl();
         this.repositoryLoader = new RepositoryLoaderImpl();
+        this.scheduler = new DefaultTaskScheduler(1, this.executorService);
     }
 
     @Override

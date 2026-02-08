@@ -1,16 +1,19 @@
 {
-    "Group": "dev.spacetivity.tobi.hylib.hytale.plugin",
-    "Name": "HyLib",
-    "Version": "1.0.0",
-    "Description": "HyLib is a utility library for Hytale server plugin development",
-    "Main": "dev.spacetivity.tobi.hylib.hytale.plugin.HyLibPlugin",
-    "Author": [
-        {
-            "Name": "DeveloperTobi",
-            "Email": "tobias.heimboeck@nexalit.at",
-            "Url": "discord.spacetivity.dev"
-        }
-    ],
-    "ServerVersion": "*",
-    "IncludeAssetPack": true
+  "Group": "dev.spacetivity.tobi.hylib.hytale.plugin",
+  "Name": "HyLib",
+  "Version": "1.0.0",
+  "Description": "HyLib is a utility library for Hytale server plugin development",
+  "Main": "dev.spacetivity.tobi.hylib.hytale.plugin.HyLibPlugin",
+  "Author": [
+    {
+      "Name": "DeveloperTobi",
+      "Email": "tobias.heimboeck@nexalit.at",
+      "Url": "discord.spacetivity.dev"
+    }
+  ],
+  "Dependencies": {
+    "dev.spacetivity.tobi.hymessage.plugin:HyMessage": "*"
+  },
+  "ServerVersion": "*",
+  "IncludeAssetPack": false
 }

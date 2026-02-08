@@ -11,12 +11,12 @@ import dev.spacetivity.tobi.hylib.database.common.DatabaseApiImpl;
 import dev.spacetivity.tobi.hylib.hytale.api.HytaleProvider;
 import dev.spacetivity.tobi.hylib.hytale.api.localization.Lang;
 import dev.spacetivity.tobi.hylib.hytale.common.HytaleApiImpl;
-import dev.spacetivity.tobi.hymessage.api.HyMessageProvider;
 import dev.spacetivity.tobi.hylib.hytale.plugin.command.LanguageCommand;
-import dev.spacetivity.tobi.hylib.hytale.plugin.command.FormattingTestCommand;
 import dev.spacetivity.tobi.hylib.hytale.plugin.config.DbConfig;
 import dev.spacetivity.tobi.hylib.hytale.plugin.config.LanguageConfig;
 import dev.spacetivity.tobi.hylib.hytale.plugin.player.PlayerListener;
+import dev.spacetivity.tobi.hymessage.api.HyMessageProvider;
+import dev.spacetivity.tobi.hymessage.common.HyMessageApiImpl;
 
 public class HyLibPlugin extends JavaPlugin {
 
@@ -58,19 +58,14 @@ public class HyLibPlugin extends JavaPlugin {
             this.dbApi.establishConnection(credentials);
         }
 
-        // Initialize HyMessage first (required by HytaleApiImpl)
-        HyMessageProvider.register(new dev.spacetivity.tobi.hymessage.common.HyMessageApiImpl());
-        
-        // Always initialize HytaleApi (works without database)
+        HyMessageProvider.register(new HyMessageApiImpl());
+
         Lang defaultLanguage = Lang.of(languageConfigValue.getDefaultLanguage());
         HytaleProvider.register(new HytaleApiImpl(getClassLoader(), defaultLanguage));
 
         if (dbConfigValue.isEnabled() && languageConfigValue.isLanguageCommandEnabled()) {
             getCommandRegistry().registerCommand(new LanguageCommand());
         }
-        
-        // Register formatting test command for screenshots
-        getCommandRegistry().registerCommand(new FormattingTestCommand());
 
         getEventRegistry().registerGlobal(PlayerReadyEvent.class, PlayerListener::onPlayerReady);
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, PlayerListener::onPlayerDisconnect);
