@@ -81,19 +81,19 @@ dependencies {
     // Hytale API (for Hytale-specific features)
     implementation("dev.spacetivity.tobi.hylib:hytale-api:VERSION")
     
-    // Note: If hylib-runtime-hytale plugin is installed, you only need hytale-api
-    // The runtime plugin provides all implementations
+    // Note: If hylib-plugin plugin is installed, you only need hytale-api
+    // The plugin provides all implementations
 }
 ```
 
 **Important:** 
-- If you have the `hylib-runtime-hytale` plugin installed on your server, you **only need** `hytale-api`. The runtime plugin already provides all implementations.
+- If you have the `hylib-plugin` plugin installed on your server, you **only need** `hytale-api`. The plugin already provides all implementations.
 
 **Note:** Even though the repository is public, GitHub Packages requires authentication for all package downloads. This is a GitHub design decision. Each developer needs their own token with `read:packages` permission.
 
 ### Runtime Plugin
 
-Install the `hylib-runtime-hytale` plugin on your server to enable:
+Install the `hylib-plugin` plugin on your server to enable:
 - Language command (`/language`) - Change your language preference
 - Player event handling
 - Global configuration

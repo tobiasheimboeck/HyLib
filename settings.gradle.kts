@@ -1,2 +1,2 @@
 rootProject.name = "HyLib"
-include("database-api", "database-common", "hytale-api", "hytale-common", "hylib-runtime-hytale")
+include("database-api", "database-common", "hytale-api", "hytale-common", "hylib-plugin")

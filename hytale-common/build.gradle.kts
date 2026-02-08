@@ -12,7 +12,7 @@ dependencies {
     
     compileOnly(libs.mariadb.jdbc)
     compileOnly(libs.hytale.server)
-    compileOnly(libs.hikaricp) // Available transitively via database-common in hylib-runtime-hytale
+    compileOnly(libs.hikaricp) // Available transitively via database-common in hylib-plugin
     implementation(libs.gson)
     
     compileOnly(libs.lombok)
