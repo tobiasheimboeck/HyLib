@@ -2,6 +2,8 @@ package dev.spacetivity.tobi.hylib.database.api.scheduler;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.Period;
 import java.util.Set;
 
 /**
@@ -176,5 +178,66 @@ public interface TaskScheduler {
      * and cannot be retrieved via {@link #getTask(int)}.</p>
      */
     void cancelAll();
+
+    /**
+     * Schedules a task to be executed at a specific time of day, repeating at the specified interval.
+     * 
+     * <p>The task will be executed asynchronously at the specified time. If the time has already
+     * passed today, the task will be scheduled for the next occurrence. The task will then repeat
+     * at the specified interval (e.g., daily, every 3 days).</p>
+     * 
+     * <p>The task remains in the scheduler until explicitly cancelled via {@link ScheduledTask#cancel()}.</p>
+     * 
+     * <p>Example usage:
+     * <pre>{@code
+     * // Schedule task to run daily at midnight
+     * scheduler.scheduleAtTimeOfDay(LocalTime.of(0, 0), () -> {
+     *     System.out.println("Daily task at midnight");
+     * });
+     * 
+     * // Schedule task to run every 3 days at 14:30
+     * scheduler.scheduleAtTimeOfDay(LocalTime.of(14, 30), Period.ofDays(3), () -> {
+     *     System.out.println("Task every 3 days at 14:30");
+     * });
+     * }</pre>
+     * 
+     * @param time the time of day to execute the task, must not be null
+     * @param task the task to execute, must not be null
+     * @return a ScheduledTask that can be used to cancel the task
+     * @throws NullPointerException if time or task is null
+     */
+    default ScheduledTask scheduleAtTimeOfDay(LocalTime time, Runnable task) {
+        return scheduleAtTimeOfDay(time, Period.ofDays(1), task);
+    }
+
+    /**
+     * Schedules a task to be executed at a specific time of day, repeating at the specified interval.
+     * 
+     * <p>The task will be executed asynchronously at the specified time. If the time has already
+     * passed today, the task will be scheduled for the next occurrence. The task will then repeat
+     * at the specified interval (e.g., daily, every 3 days).</p>
+     * 
+     * <p>The task remains in the scheduler until explicitly cancelled via {@link ScheduledTask#cancel()}.</p>
+     * 
+     * <p>Example usage:
+     * <pre>{@code
+     * // Schedule task to run daily at midnight
+     * scheduler.scheduleAtTimeOfDay(LocalTime.of(0, 0), Period.ofDays(1), () -> {
+     *     System.out.println("Daily task at midnight");
+     * });
+     * 
+     * // Schedule task to run every 3 days at 14:30
+     * scheduler.scheduleAtTimeOfDay(LocalTime.of(14, 30), Period.ofDays(3), () -> {
+     *     System.out.println("Task every 3 days at 14:30");
+     * });
+     * }</pre>
+     * 
+     * @param time the time of day to execute the task, must not be null
+     * @param period the interval between executions (e.g., Period.ofDays(1) for daily, Period.ofDays(3) for every 3 days), must not be null
+     * @param task the task to execute, must not be null
+     * @return a ScheduledTask that can be used to cancel the task
+     * @throws NullPointerException if time, period, or task is null
+     */
+    ScheduledTask scheduleAtTimeOfDay(LocalTime time, Period period, Runnable task);
 
 }

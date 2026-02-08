@@ -3,8 +3,7 @@ package dev.spacetivity.tobi.hylib.database.common.api.scheduler;
 import dev.spacetivity.tobi.hylib.database.api.scheduler.ScheduledTask;
 import dev.spacetivity.tobi.hylib.database.api.scheduler.TaskScheduler;
 
-import java.time.Duration;
-import java.time.Instant;
+import java.time.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -150,6 +149,64 @@ public class DefaultTaskScheduler implements TaskScheduler {
     public void cancelAll() {
         this.tasks.values().forEach(future -> future.cancel(false));
         this.tasks.clear();
+    }
+
+    @Override
+    public ScheduledTask scheduleAtTimeOfDay(LocalTime time, Period period, Runnable task) {
+        int id = taskIdSeq.incrementAndGet();
+        
+        // Calculate next execution time
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime todayAtTime = now.toLocalDate().atTime(time).atZone(now.getZone());
+        
+        // If the time has already passed today, schedule for next occurrence
+        final ZonedDateTime nextExecution = (todayAtTime.isBefore(now) || todayAtTime.isEqual(now))
+            ? todayAtTime.plus(period)
+            : todayAtTime;
+        
+        Duration initialDelay = Duration.between(now, nextExecution);
+        
+        // Create a self-rescheduling task
+        Runnable reschedulingTask = new Runnable() {
+            private ZonedDateTime nextRun = nextExecution;
+            
+            @Override
+            public void run() {
+                // Execute the actual task
+                worker.submit(task);
+                
+                // Schedule next execution
+                nextRun = nextRun.plus(period);
+                ZonedDateTime currentTime = ZonedDateTime.now();
+                
+                // Ensure we don't schedule in the past (shouldn't happen, but safety check)
+                if (nextRun.isBefore(currentTime)) {
+                    nextRun = currentTime.toLocalDate().atTime(time).atZone(currentTime.getZone());
+                    if (nextRun.isBefore(currentTime) || nextRun.isEqual(currentTime)) {
+                        nextRun = nextRun.plus(period);
+                    }
+                }
+                
+                Duration delayUntilNext = Duration.between(currentTime, nextRun);
+                
+                ScheduledFuture<?> future = scheduler.schedule(
+                    this,
+                    delayUntilNext.toMillis(),
+                    TimeUnit.MILLISECONDS
+                );
+                
+                tasks.put(id, future);
+            }
+        };
+        
+        ScheduledFuture<?> future = scheduler.schedule(
+            reschedulingTask,
+            initialDelay.toMillis(),
+            TimeUnit.MILLISECONDS
+        );
+        
+        this.tasks.put(id, future);
+        return wrap(id, future);
     }
 
     private ScheduledTask wrap(int id, ScheduledFuture<?> future) {
